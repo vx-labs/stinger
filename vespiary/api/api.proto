@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package api;
+
+message DeviceSet {
+  repeated Device Devices = 1;
+}
+message Device {
+  string Owner = 1;
+  string ID = 2;
+  string Name = 3;
+  bool Active = 4;
+  int64 CreatedAt = 5;
+  string Password = 6;
+}
+
+message CreateDeviceRequest {
+  string Owner = 1;
+  string Name = 2;
+  bool Active = 3;
+  string Password = 4;
+}
+message CreateDeviceResponse { string ID = 1; }
+
+message DeleteDeviceRequest {
+  string Owner = 1;
+  string ID = 2;
+}
+message DeleteDeviceResponse { string ID = 1; }
+
+message ListDevicesRequest { string Owner = 1; }
+message ListDevicesResponse { repeated Device Devices = 1; }
+
+message GetDeviceRequest {
+  string Owner = 1;
+  string ID = 2;
+}
+message GetDeviceResponse { Device Device = 1; }
+
+message EnableDeviceRequest {
+  string Owner = 1;
+  string ID = 2;
+}
+message EnableDeviceResponse {}
+
+message DisableDeviceRequest {
+  string Owner = 1;
+  string ID = 2;
+}
+message DisableDeviceResponse {}
+
+message ChangeDevicePasswordRequest {
+  string Owner = 1;
+  string ID = 2;
+  string NewPassword = 3;
+}
+message ChangeDevicePasswordResponse {}
+
+service Vespiary {
+  rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
+  rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse);
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
+  rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse);
+  rpc EnableDevice(EnableDeviceRequest) returns (EnableDeviceResponse);
+  rpc DisableDevice(DisableDeviceRequest) returns (DisableDeviceResponse);
+  rpc ChangeDevicePassword(ChangeDevicePasswordRequest) returns (ChangeDevicePasswordResponse);
+}
+
+message ShutdownRequest {}
+message ShutdownResponse {}
+
+service Node {
+  rpc Shutdown(ShutdownRequest) returns (ShutdownResponse) {}
+}

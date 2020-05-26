@@ -1,0 +1,43 @@
+syntax = "proto3";
+package fsm;
+
+message StateTransitionSet { repeated StateTransition events = 1; }
+
+message PeerLost { uint64 Peer = 1; }
+
+message DeviceCreated {
+  string ID = 1;
+  string Owner = 2;
+  string Name = 3;
+  bool Active = 4;
+  string Password = 5;
+  int64 CreatedAt = 6;
+}
+message DeviceDeleted {
+  string ID = 1;
+  string Owner = 2;
+}
+message DeviceEnabled {
+  string ID = 1;
+  string Owner = 2;
+}
+message DeviceDisabled {
+  string ID = 1;
+  string Owner = 2;
+}
+message DevicePasswordChanged {
+  string ID = 1;
+  string Owner = 2;
+  string Password = 3;
+}
+
+message StateTransition {
+  oneof Event {
+    PeerLost PeerLost = 1;
+    DeviceCreated DeviceCreated = 2;
+    DeviceDeleted DeviceDeleted = 3;
+    DeviceEnabled DeviceEnabled = 4;
+    DeviceDisabled DeviceDisabled = 5;
+    DevicePasswordChanged DevicePasswordChanged = 6;
+  }
+}
