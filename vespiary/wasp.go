@@ -46,6 +46,7 @@ func (s *WaspAuthenticationServer) AuthenticateMQTTClient(ctx context.Context, i
 	}
 	if device.Active && device.Password == fingerprintBytes(input.MQTT.Password) {
 		return &auth.WaspAuthenticationResponse{
+			ID:         device.ID,
 			MountPoint: device.Owner,
 		}, nil
 	}
