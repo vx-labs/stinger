@@ -23,10 +23,8 @@ import (
 	"github.com/vx-labs/vespiary/vespiary/fsm"
 	"github.com/vx-labs/vespiary/vespiary/rpc"
 	"github.com/vx-labs/wasp/cluster"
-	"github.com/vx-labs/wasp/cluster/membership"
 	"github.com/vx-labs/wasp/cluster/raft"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
@@ -131,7 +129,6 @@ func main() {
 			stateStore := vespiary.NewStateStore()
 			healthServer.Resume()
 			wg := sync.WaitGroup{}
-			stateLoaded := make(chan struct{})
 			cancelCh := make(chan struct{})
 			commandsCh := make(chan raft.Command)
 			if config.GetString("rpc-tls-certificate-file") == "" || config.GetString("rpc-tls-private-key-file") == "" {
@@ -155,21 +152,6 @@ func main() {
 			if err != nil {
 				vespiary.L(ctx).Fatal("cluster listener failed to start", zap.Error(err))
 			}
-			mesh := membership.New(
-				id,
-				"vespiary",
-				config.GetInt("serf-port"),
-				config.GetString("serf-advertized-address"),
-				config.GetInt("serf-advertized-port"),
-				config.GetInt("raft-advertized-port"),
-				rpcDialer,
-				vespiary.L(ctx),
-			)
-			rpcAddress := fmt.Sprintf("%s:%d", config.GetString("raft-advertized-address"), config.GetInt("raft-advertized-port"))
-			mesh.UpdateMetadata(membership.EncodeMD(id,
-				"vespiary",
-				rpcAddress,
-			))
 			joinList := config.GetStringSlice("join-node")
 			if config.GetBool("consul-join") {
 				discoveryStarted := time.Now()
@@ -183,29 +165,35 @@ func main() {
 					zap.Duration("consul_discovery_duration", time.Since(discoveryStarted)), zap.Int("node_count", len(consulJoinList)))
 				joinList = append(joinList, consulJoinList...)
 			}
-			if len(joinList) > 0 {
-				joinStarted := time.Now()
-				retryTicker := time.NewTicker(3 * time.Second)
-				for {
-					err = mesh.Join(joinList)
-					if err != nil {
-						vespiary.L(ctx).Warn("failed to join gossip mesh", zap.Error(err))
-					} else {
-						break
-					}
-					<-retryTicker.C
-				}
-				retryTicker.Stop()
-				vespiary.L(ctx).Info("joined gossip mesh",
-					zap.Duration("gossip_join_duration", time.Since(joinStarted)), zap.Strings("gossip_node_list", joinList))
-			}
-			raftConfig := raft.Config{
-				NodeID:      id,
-				DataDir:     config.GetString("data-dir"),
-				GetSnapshot: stateStore.Dump,
-			}
-			raftNode := raft.NewNode(raftConfig, mesh, vespiary.L(ctx))
-			raftNode.Serve(server)
+
+			clusterNode := cluster.NewNode(cluster.NodeConfig{
+				ID:            id,
+				ServiceName:   "vespiary",
+				DataDirectory: config.GetString("data-dir"),
+				GossipConfig: cluster.GossipConfig{
+					JoinList: joinList,
+					Network: cluster.NetworkConfig{
+						AdvertizedHost: config.GetString("serf-advertized-address"),
+						AdvertizedPort: config.GetInt("serf-advertized-port"),
+						ListeningPort:  config.GetInt("serf-port"),
+					},
+				},
+				RaftConfig: cluster.RaftConfig{
+					GetStateSnapshot:  stateStore.Dump,
+					ExpectedNodeCount: config.GetInt("raft-bootstrap-expect"),
+					Network: cluster.NetworkConfig{
+						AdvertizedHost: config.GetString("raft-advertized-address"),
+						AdvertizedPort: config.GetInt("raft-advertized-port"),
+						ListeningPort:  config.GetInt("raft-port"),
+					},
+				},
+			}, rpcDialer, server, vespiary.L(ctx))
+
+			async.Run(ctx, &wg, func(ctx context.Context) {
+				defer vespiary.L(ctx).Debug("cluster node stopped")
+				clusterNode.Run(ctx)
+			})
+
 			stateMachine := fsm.NewFSM(id, stateStore, commandsCh)
 			vespiaryServer := vespiary.NewServer(stateMachine, stateStore)
 			vespiaryServer.Serve(server)
@@ -219,76 +207,8 @@ func main() {
 					vespiary.L(ctx).Fatal("cluster listener crashed", zap.Error(err))
 				}
 			})
-			async.Run(ctx, &wg, func(ctx context.Context) {
-				defer vespiary.L(ctx).Info("raft node stopped")
-				join := false
-				peers := raft.Peers{}
-				if expectedCount := config.GetInt("raft-bootstrap-expect"); expectedCount > 1 {
-					vespiary.L(ctx).Debug("waiting for nodes to be discovered", zap.Int("expected_node_count", expectedCount))
-					peers, err = mesh.WaitForNodes(ctx, "vespiary", expectedCount, cluster.RaftContext{
-						ID:      id,
-						Address: rpcAddress,
-					}, rpcDialer)
-					if err != nil {
-						if err == membership.ErrExistingClusterFound {
-							vespiary.L(ctx).Info("discovered existing raft cluster")
-							join = true
-						} else {
-							vespiary.L(ctx).Fatal("failed to discover nodes on gossip mesh", zap.Error(err))
-						}
-					}
-					vespiary.L(ctx).Info("discovered nodes on gossip mesh", zap.Int("discovered_node_count", len(peers)))
-				} else {
-					vespiary.L(ctx).Info("skipping raft node discovery: expected node count is below 1", zap.Int("expected_node_count", expectedCount))
-				}
-				if join {
-					vespiary.L(ctx).Info("joining raft cluster", zap.Array("raft_peers", peers))
-				} else {
-					vespiary.L(ctx).Info("bootstraping raft cluster", zap.Array("raft_peers", peers))
-				}
-				go func() {
-					defer close(stateLoaded)
-					select {
-					case <-raftNode.Ready():
-						if join && raftNode.IsRemovedFromCluster() {
-							vespiary.L(ctx).Debug("local node is not a cluster member, will attempt join")
-							ticker := time.NewTicker(1 * time.Second)
-							defer ticker.Stop()
-							for {
-								if raftNode.IsLeader() {
-									return
-								}
-								for _, peer := range peers {
-									ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
-									err := mesh.Call(peer.ID, func(c *grpc.ClientConn) error {
-										_, err = cluster.NewRaftClient(c).JoinCluster(ctx, &cluster.RaftContext{
-											ID:      id,
-											Address: rpcAddress,
-										})
-										return err
-									})
-									cancel()
-									if err != nil {
-										vespiary.L(ctx).Debug("failed to join raft cluster, retrying", zap.Error(err))
-									} else {
-										vespiary.L(ctx).Info("joined cluster")
-										return
-									}
-								}
-								select {
-								case <-ticker.C:
-								case <-ctx.Done():
-									return
-								}
-							}
-						}
-					case <-ctx.Done():
-						return
-					}
-				}()
-				raftNode.Run(ctx, peers, join, raft.NodeConfig{})
-			})
-			snapshotter := <-raftNode.Snapshotter()
+
+			snapshotter := <-clusterNode.Snapshotter()
 			async.Run(ctx, &wg, func(ctx context.Context) {
 				defer vespiary.L(ctx).Info("command publisher stopped")
 				for {
@@ -296,7 +216,7 @@ func main() {
 					case <-ctx.Done():
 						return
 					case event := <-commandsCh:
-						err := raftNode.Apply(event.Ctx, event.Payload)
+						err := clusterNode.Apply(event.Ctx, event.Payload)
 						select {
 						case <-ctx.Done():
 						case <-event.Ctx.Done():
@@ -312,7 +232,7 @@ func main() {
 					select {
 					case <-ctx.Done():
 						return
-					case event := <-raftNode.Commits():
+					case event := <-clusterNode.Commits():
 						if event.Payload == nil {
 							snapshot, err := snapshotter.Load()
 							if err != nil {
@@ -329,7 +249,7 @@ func main() {
 					}
 				}
 			})
-			<-stateLoaded
+			<-clusterNode.Ready()
 
 			healthServer.SetServingStatus("mqtt", healthpb.HealthCheckResponse_SERVING)
 			healthServer.SetServingStatus("node", healthpb.HealthCheckResponse_SERVING)
@@ -350,11 +270,11 @@ func main() {
 			} else {
 				vespiary.L(ctx).Debug("state machine stopped")
 			}
-			err = raftNode.Leave(ctx)
+			err = clusterNode.Shutdown()
 			if err != nil {
-				vespiary.L(ctx).Error("failed to leave raft cluster", zap.Error(err))
+				vespiary.L(ctx).Error("failed to leave cluster", zap.Error(err))
 			} else {
-				vespiary.L(ctx).Debug("raft cluster left")
+				vespiary.L(ctx).Debug("cluster left")
 			}
 			healthServer.Shutdown()
 			vespiary.L(ctx).Debug("health server stopped")
@@ -369,8 +289,6 @@ func main() {
 			cancel()
 			wg.Wait()
 			vespiary.L(ctx).Debug("asynchronous operations stopped")
-			mesh.Shutdown()
-			vespiary.L(ctx).Debug("mesh stopped")
 			vespiary.L(ctx).Info("vespiary successfully stopped")
 		},
 	}
