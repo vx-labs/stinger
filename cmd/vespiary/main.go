@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/signal"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 
@@ -19,9 +18,9 @@ import (
 	"github.com/spf13/viper"
 	"github.com/vx-labs/vespiary/vespiary"
 	"github.com/vx-labs/vespiary/vespiary/api"
-	"github.com/vx-labs/vespiary/vespiary/async"
 	"github.com/vx-labs/vespiary/vespiary/fsm"
 	"github.com/vx-labs/vespiary/vespiary/rpc"
+	"github.com/vx-labs/wasp/async"
 	"github.com/vx-labs/wasp/cluster"
 	"github.com/vx-labs/wasp/cluster/raft"
 	"go.uber.org/zap"
@@ -128,7 +127,7 @@ func main() {
 			healthServer := health.NewServer()
 			stateStore := vespiary.NewStateStore()
 			healthServer.Resume()
-			wg := sync.WaitGroup{}
+			operations := async.NewOperations(ctx, vespiary.L(ctx))
 			cancelCh := make(chan struct{})
 			commandsCh := make(chan raft.Command)
 			if config.GetString("rpc-tls-certificate-file") == "" || config.GetString("rpc-tls-private-key-file") == "" {
@@ -189,8 +188,7 @@ func main() {
 				},
 			}, rpcDialer, server, vespiary.L(ctx))
 
-			async.Run(ctx, &wg, func(ctx context.Context) {
-				defer vespiary.L(ctx).Debug("cluster node stopped")
+			operations.Run("cluster node", func(ctx context.Context) {
 				clusterNode.Run(ctx)
 			})
 
@@ -199,18 +197,15 @@ func main() {
 			vespiaryServer.Serve(server)
 			waspAuthServer := vespiary.NewWaspAuthenticationServer(stateMachine, stateStore)
 			waspAuthServer.Serve(server)
-			async.Run(ctx, &wg, func(ctx context.Context) {
-				defer vespiary.L(ctx).Info("cluster listener stopped")
-
+			operations.Run("cluster listener", func(ctx context.Context) {
 				err := server.Serve(clusterListener)
 				if err != nil {
-					vespiary.L(ctx).Fatal("cluster listener crashed", zap.Error(err))
+					panic(err)
 				}
 			})
 
 			snapshotter := <-clusterNode.Snapshotter()
-			async.Run(ctx, &wg, func(ctx context.Context) {
-				defer vespiary.L(ctx).Info("command publisher stopped")
+			operations.Run("command publisher", func(ctx context.Context) {
 				for {
 					select {
 					case <-ctx.Done():
@@ -226,8 +221,7 @@ func main() {
 					}
 				}
 			})
-			async.Run(ctx, &wg, func(ctx context.Context) {
-				defer vespiary.L(ctx).Info("command processor stopped")
+			operations.Run("command processor", func(ctx context.Context) {
 				for {
 					select {
 					case <-ctx.Done():
@@ -287,7 +281,7 @@ func main() {
 			clusterListener.Close()
 			vespiary.L(ctx).Debug("rpc listener stopped")
 			cancel()
-			wg.Wait()
+			operations.Wait()
 			vespiary.L(ctx).Debug("asynchronous operations stopped")
 			vespiary.L(ctx).Info("vespiary successfully stopped")
 		},
