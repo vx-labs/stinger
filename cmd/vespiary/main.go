@@ -205,6 +205,14 @@ func main() {
 			})
 
 			snapshotter := <-clusterNode.Snapshotter()
+			snapshot, err := snapshotter.Load()
+			if err == nil {
+				err = stateStore.Load(snapshot.Data)
+				if err != nil {
+					vespiary.L(ctx).Fatal("failed to load snapshot in store", zap.Error(err))
+				}
+			}
+
 			operations.Run("command publisher", func(ctx context.Context) {
 				for {
 					select {
