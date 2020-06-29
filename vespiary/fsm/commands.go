@@ -2,6 +2,7 @@ package fsm
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -9,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	"github.com/vx-labs/vespiary/vespiary/api"
+	"github.com/vx-labs/vespiary/vespiary/audit"
 	"github.com/vx-labs/wasp/cluster/raft"
 )
 
@@ -35,17 +37,67 @@ func encode(events ...*StateTransition) ([]byte, error) {
 	return proto.Marshal(&format)
 }
 
-func NewFSM(id uint64, state State, commandsCh chan raft.Command) *FSM {
-	return &FSM{id: id, state: state, commandsCh: commandsCh}
+func NewFSM(id uint64, state State, commandsCh chan raft.Command, recorder audit.Recorder) *FSM {
+	return &FSM{id: id, state: state, commandsCh: commandsCh, recorder: recorder}
 }
 
 type FSM struct {
 	id         uint64
 	state      State
 	commandsCh chan raft.Command
+	recorder   audit.Recorder
 }
 
-func (f *FSM) commit(ctx context.Context, payload []byte) error {
+func (f *FSM) record(ctx context.Context, events ...*StateTransition) error {
+	var err error
+	for _, event := range events {
+		switch event := event.GetEvent().(type) {
+		case *StateTransition_DeviceCreated:
+			input := event.DeviceCreated
+			tenant := input.Owner
+			err = f.recorder.RecordEvent(tenant, audit.DeviceCreated, map[string]string{
+				"device_id": input.ID,
+			})
+		case *StateTransition_DeviceDeleted:
+			input := event.DeviceDeleted
+			tenant := input.Owner
+			err = f.recorder.RecordEvent(tenant, audit.DeviceDeleted, map[string]string{
+				"device_id": input.ID,
+			})
+		case *StateTransition_DeviceEnabled:
+			input := event.DeviceEnabled
+			tenant := input.Owner
+			err = f.recorder.RecordEvent(tenant, audit.DeviceEnabled, map[string]string{
+				"device_id": input.ID,
+			})
+		case *StateTransition_DeviceDisabled:
+			input := event.DeviceDisabled
+			tenant := input.Owner
+			err = f.recorder.RecordEvent(tenant, audit.DeviceDisabled, map[string]string{
+				"device_id": input.ID,
+			})
+		case *StateTransition_DevicePasswordChanged:
+			input := event.DevicePasswordChanged
+			tenant := input.Owner
+			err = f.recorder.RecordEvent(tenant, audit.DevicePasswordChanged, map[string]string{
+				"device_id": input.ID,
+			})
+		case *StateTransition_PeerLost:
+		}
+		if err != nil {
+			log.Println(err)
+			// Do not fail if audit recording fails
+			return nil
+		}
+	}
+	return nil
+}
+
+func (f *FSM) commit(ctx context.Context, events ...*StateTransition) error {
+	payload, err := encode(events...)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 	out := make(chan error)
@@ -57,63 +109,51 @@ func (f *FSM) commit(ctx context.Context, payload []byte) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case err := <-out:
+			if err == nil {
+				f.record(ctx, events...)
+			}
 			return err
 		}
 	}
 }
 
 func (f *FSM) DeleteDevice(ctx context.Context, id, owner string) error {
-	payload, err := encode(&StateTransition{Event: &StateTransition_DeviceDeleted{
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_DeviceDeleted{
 		DeviceDeleted: &DeviceDeleted{
 			ID:    id,
 			Owner: owner,
 		},
 	}})
-	if err != nil {
-		return err
-	}
-	return f.commit(ctx, payload)
+
 }
 func (f *FSM) DisableDevice(ctx context.Context, id, owner string) error {
-	payload, err := encode(&StateTransition{Event: &StateTransition_DeviceDisabled{
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_DeviceDisabled{
 		DeviceDisabled: &DeviceDisabled{
 			ID:    id,
 			Owner: owner,
 		},
 	}})
-	if err != nil {
-		return err
-	}
-	return f.commit(ctx, payload)
 }
 func (f *FSM) EnableDevice(ctx context.Context, id, owner string) error {
-	payload, err := encode(&StateTransition{Event: &StateTransition_DeviceEnabled{
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_DeviceEnabled{
 		DeviceEnabled: &DeviceEnabled{
 			ID:    id,
 			Owner: owner,
 		},
 	}})
-	if err != nil {
-		return err
-	}
-	return f.commit(ctx, payload)
 }
 func (f *FSM) ChangeDevicePassword(ctx context.Context, id, owner, password string) error {
-	payload, err := encode(&StateTransition{Event: &StateTransition_DevicePasswordChanged{
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_DevicePasswordChanged{
 		DevicePasswordChanged: &DevicePasswordChanged{
 			ID:    id,
 			Owner: owner,
 		},
 	}})
-	if err != nil {
-		return err
-	}
-	return f.commit(ctx, payload)
 }
 func (f *FSM) CreateDevice(ctx context.Context, owner, name, password string, active bool) (string, error) {
 	id := uuid.New().String()
 	now := time.Now().UnixNano()
-	payload, err := encode(&StateTransition{Event: &StateTransition_DeviceCreated{
+	return id, f.commit(ctx, &StateTransition{Event: &StateTransition_DeviceCreated{
 		DeviceCreated: &DeviceCreated{
 			ID:        id,
 			Owner:     owner,
@@ -123,22 +163,14 @@ func (f *FSM) CreateDevice(ctx context.Context, owner, name, password string, ac
 			Active:    active,
 		},
 	}})
-	if err != nil {
-		return "", err
-	}
-	return id, f.commit(ctx, payload)
 }
 
 func (f *FSM) Shutdown(ctx context.Context) error {
-	payload, err := encode(&StateTransition{Event: &StateTransition_PeerLost{
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_PeerLost{
 		PeerLost: &PeerLost{
 			Peer: f.id,
 		},
 	}})
-	if err != nil {
-		return err
-	}
-	return f.commit(ctx, payload)
 }
 
 func (f *FSM) Apply(index uint64, b []byte) error {

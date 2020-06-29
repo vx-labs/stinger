@@ -17,12 +17,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/vx-labs/vespiary/vespiary"
-	"github.com/vx-labs/vespiary/vespiary/api"
 	"github.com/vx-labs/vespiary/vespiary/fsm"
-	"github.com/vx-labs/vespiary/vespiary/rpc"
 	"github.com/vx-labs/wasp/async"
 	"github.com/vx-labs/wasp/cluster"
 	"github.com/vx-labs/wasp/cluster/raft"
+	"github.com/vx-labs/wasp/rpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -140,7 +139,6 @@ func main() {
 				TLSPrivateKeyPath:           config.GetString("rpc-tls-private-key-file"),
 			})
 			healthpb.RegisterHealthServer(server, healthServer)
-			api.RegisterNodeServer(server, rpc.NewNodeRPCServer(cancelCh))
 			rpcDialer := rpc.GRPCDialer(rpc.ClientConfig{
 				InsecureSkipVerify:          config.GetBool("insecure"),
 				TLSCertificatePath:          config.GetString("rpc-tls-certificate-file"),
@@ -191,8 +189,12 @@ func main() {
 			operations.Run("cluster node", func(ctx context.Context) {
 				clusterNode.Run(ctx)
 			})
+			auditRecorder, err := getAuditRecorder(ctx, rpcDialer, config, vespiary.L(ctx))
+			if err != nil {
+				vespiary.L(ctx).Fatal("failed to create audit recorder", zap.Error(err))
+			}
 
-			stateMachine := fsm.NewFSM(id, stateStore, commandsCh)
+			stateMachine := fsm.NewFSM(id, stateStore, commandsCh, auditRecorder)
 			vespiaryServer := vespiary.NewServer(stateMachine, stateStore)
 			vespiaryServer.Serve(server)
 			waspAuthServer := vespiary.NewWaspAuthenticationServer(stateMachine, stateStore)
@@ -320,6 +322,9 @@ func main() {
 	cmd.Flags().String("rpc-tls-certificate-authority-file", "", "x509 certificate authority used by RPC Server.")
 	cmd.Flags().String("rpc-tls-certificate-file", "", "x509 certificate used by RPC Server.")
 	cmd.Flags().String("rpc-tls-private-key-file", "", "Private key used by RPC Server.")
+
+	cmd.Flags().String("audit-recorder", "none", "Audit recorder used to record state updates. Set to \"none\" to disable audit.")
+	cmd.Flags().String("audit-recorder-grpc-address", "", "GRPC Audit Recorder server address, when using \"grpc\" audit recorder.")
 
 	cmd.AddCommand(TLSHelper(config))
 	cmd.Execute()

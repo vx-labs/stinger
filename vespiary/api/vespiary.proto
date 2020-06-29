@@ -72,3 +72,21 @@ message ShutdownResponse {}
 service Node {
   rpc Shutdown(ShutdownRequest) returns (ShutdownResponse) {}
 }
+
+message VespiaryEventAttribute {
+  string Key = 1;
+  string Value = 2;
+}
+
+message VespiaryAuditEvent {
+  int64 Timestamp = 1;
+  string Tenant = 2;
+  string Kind = 3;
+  repeated VespiaryEventAttribute Attributes = 4;
+}
+message PutVespiaryEventRequest { repeated VespiaryAuditEvent Events = 1; }
+message PutVespiaryEventsResponse {}
+
+service VespiaryAuditRecorder {
+  rpc PutVespiaryEvents(PutVespiaryEventRequest) returns (PutVespiaryEventsResponse) {}
+}
