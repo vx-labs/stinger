@@ -5,6 +5,15 @@ message StateTransitionSet { repeated StateTransition events = 1; }
 
 message PeerLost { uint64 Peer = 1; }
 
+message AccountCreated {
+  string ID = 1; // uuid
+  string Name = 2;
+  repeated string Principals = 3;      // auth0 user id
+  repeated string DeviceUsernames = 4; // the old 'vx:psk'
+  int64 CreatedAt = 5;
+}
+message AccountDeleted { string ID = 1; }
+
 message DeviceCreated {
   string ID = 1;
   string Owner = 2;
@@ -39,5 +48,7 @@ message StateTransition {
     DeviceEnabled DeviceEnabled = 4;
     DeviceDisabled DeviceDisabled = 5;
     DevicePasswordChanged DevicePasswordChanged = 6;
+    AccountCreated AccountCreated = 7;
+    AccountDeleted AccountDeleted = 8;
   }
 }

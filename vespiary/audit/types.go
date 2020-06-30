@@ -3,6 +3,8 @@ package audit
 type event string
 
 const (
+	AccountCreated        event = "account_created"
+	AccountDeleted        event = "account_deleted"
 	DeviceCreated         event = "device_created"
 	DeviceDeleted         event = "device_deleted"
 	DeviceDisabled        event = "device_disabled"

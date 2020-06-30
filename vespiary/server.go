@@ -15,12 +15,17 @@ type FSM interface {
 	EnableDevice(ctx context.Context, id, owner string) error
 	DisableDevice(ctx context.Context, id, owner string) error
 	ChangeDevicePassword(ctx context.Context, id, owner, password string) error
+	CreateAccount(ctx context.Context, name string, principals, deviceUsernames []string) (string, error)
+	DeleteAccount(ctx context.Context, id string) error
 }
 
 type State interface {
 	DevicesByOwner(owner string) ([]*api.Device, error)
 	DeviceByID(owner, id string) (*api.Device, error)
 	DeviceByName(owner, name string) (*api.Device, error)
+	ListAccounts() ([]*api.Account, error)
+	AccountByName(name string) (*api.Account, error)
+	AccountByID(id string) (*api.Account, error)
 }
 
 func NewServer(fsm FSM, state State) *server {
@@ -108,4 +113,40 @@ func (s *server) ChangeDevicePassword(ctx context.Context, input *api.ChangeDevi
 		return nil, err
 	}
 	return &api.ChangeDevicePasswordResponse{}, nil
+}
+func (s *server) CreateAccount(ctx context.Context, input *api.CreateAccountRequest) (*api.CreateAccountResponse, error) {
+	_, err := s.state.AccountByName(input.Name)
+	if err == nil {
+		return nil, status.Error(codes.AlreadyExists, "account already exists")
+	}
+
+	id, err := s.fsm.CreateAccount(ctx, input.Name, input.Principals, input.DeviceUsernames)
+	if err != nil {
+		return nil, err
+	}
+	return &api.CreateAccountResponse{
+		ID: id,
+	}, nil
+
+}
+func (s *server) DeleteAccount(ctx context.Context, input *api.DeleteAccountRequest) (*api.DeleteAccountResponse, error) {
+	_, err := s.state.AccountByID(input.ID)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "account does not exist")
+	}
+	err = s.fsm.DeleteAccount(ctx, input.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.DeleteAccountResponse{}, nil
+
+}
+
+func (s *server) ListAccounts(ctx context.Context, input *api.ListAccountsRequest) (*api.ListAccountsResponse, error) {
+	accounts, err := s.state.ListAccounts()
+	if err != nil {
+		return nil, err
+	}
+	return &api.ListAccountsResponse{Accounts: accounts}, nil
+
 }

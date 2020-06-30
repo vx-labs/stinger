@@ -12,7 +12,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/vx-labs/vespiary/vespiary/api"
 	cluster "github.com/vx-labs/wasp/cluster/clusterpb"
 	"go.uber.org/zap"
 )
@@ -49,10 +48,6 @@ func main() {
 	raft := &cobra.Command{
 		Use: "raft",
 	}
-	node := &cobra.Command{
-		Use: "node",
-	}
-	mqtt := Devices(ctx, config)
 	raft.AddCommand(&cobra.Command{
 		Use: "members",
 		Run: func(cmd *cobra.Command, _ []string) {
@@ -74,23 +69,12 @@ func main() {
 			table.Render()
 		},
 	})
-	node.AddCommand(&cobra.Command{
-		Use: "shutdown",
-		Run: func(cmd *cobra.Command, args []string) {
-			conn, l := mustDial(ctx, cmd, config)
-			_, err := api.NewNodeClient(conn).Shutdown(ctx, &api.ShutdownRequest{})
-			if err != nil {
-				l.Fatal("failed to shutdown node", zap.Error(err))
-			}
-			fmt.Println("Shutdown started")
-		},
-	})
 
 	hostname, _ := os.Hostname()
 
 	rootCmd.AddCommand(raft)
-	rootCmd.AddCommand(node)
-	rootCmd.AddCommand(mqtt)
+	rootCmd.AddCommand(Devices(ctx, config))
+	rootCmd.AddCommand(Accounts(ctx, config))
 	rootCmd.PersistentFlags().BoolP("insecure", "k", false, "Disable GRPC client-side TLS validation.")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Increase log verbosity.")
 	rootCmd.PersistentFlags().BoolP("use-vault", "v", false, "Use Hashicorp Vault to generate GRPC Certificates.")

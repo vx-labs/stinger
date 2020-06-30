@@ -2,6 +2,7 @@ package fsm
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -20,6 +21,8 @@ type State interface {
 	EnableDevice(id, owner string) error
 	DisableDevice(id, owner string) error
 	ChangeDevicePassword(id, owner, password string) error
+	CreateAccount(account *api.Account) error
+	DeleteAccount(id string) error
 }
 
 func decode(payload []byte) ([]*StateTransition, error) {
@@ -52,6 +55,14 @@ func (f *FSM) record(ctx context.Context, events ...*StateTransition) error {
 	var err error
 	for _, event := range events {
 		switch event := event.GetEvent().(type) {
+		case *StateTransition_AccountCreated:
+			input := event.AccountCreated
+			tenant := input.ID
+			err = f.recorder.RecordEvent(tenant, audit.AccountCreated, map[string]string{})
+		case *StateTransition_AccountDeleted:
+			input := event.AccountDeleted
+			tenant := input.ID
+			err = f.recorder.RecordEvent(tenant, audit.AccountDeleted, map[string]string{})
 		case *StateTransition_DeviceCreated:
 			input := event.DeviceCreated
 			tenant := input.Owner
@@ -117,6 +128,30 @@ func (f *FSM) commit(ctx context.Context, events ...*StateTransition) error {
 	}
 }
 
+func (f *FSM) CreateAccount(ctx context.Context, name string, principals, deviceUsernames []string) (string, error) {
+	if name == "" {
+		return "", errors.New("account must have a name")
+	}
+	id := uuid.New().String()
+	now := time.Now().UnixNano()
+
+	return id, f.commit(ctx, &StateTransition{Event: &StateTransition_AccountCreated{
+		AccountCreated: &AccountCreated{
+			ID:              id,
+			Name:            name,
+			Principals:      principals,
+			DeviceUsernames: deviceUsernames,
+			CreatedAt:       now,
+		},
+	}})
+}
+func (f *FSM) DeleteAccount(ctx context.Context, id string) error {
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_AccountDeleted{
+		AccountDeleted: &AccountDeleted{
+			ID: id,
+		},
+	}})
+}
 func (f *FSM) DeleteDevice(ctx context.Context, id, owner string) error {
 	return f.commit(ctx, &StateTransition{Event: &StateTransition_DeviceDeleted{
 		DeviceDeleted: &DeviceDeleted{
@@ -124,7 +159,6 @@ func (f *FSM) DeleteDevice(ctx context.Context, id, owner string) error {
 			Owner: owner,
 		},
 	}})
-
 }
 func (f *FSM) DisableDevice(ctx context.Context, id, owner string) error {
 	return f.commit(ctx, &StateTransition{Event: &StateTransition_DeviceDisabled{
@@ -180,6 +214,17 @@ func (f *FSM) Apply(index uint64, b []byte) error {
 	}
 	for _, event := range events {
 		switch event := event.GetEvent().(type) {
+		case *StateTransition_AccountCreated:
+			in := event.AccountCreated
+			err = f.state.CreateAccount(&api.Account{
+				ID:              in.ID,
+				Name:            in.Name,
+				Principals:      in.DeviceUsernames,
+				DeviceUsernames: in.DeviceUsernames,
+				CreatedAt:       in.CreatedAt,
+			})
+		case *StateTransition_AccountDeleted:
+			err = f.state.DeleteAccount(event.AccountDeleted.ID)
 		case *StateTransition_DeviceCreated:
 			in := event.DeviceCreated
 			err = f.state.CreateDevice(&api.Device{

@@ -24,6 +24,116 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type Account struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`
+	Principals           []string `protobuf:"bytes,3,rep,name=Principals,proto3" json:"Principals,omitempty"`
+	DeviceUsernames      []string `protobuf:"bytes,4,rep,name=DeviceUsernames,proto3" json:"DeviceUsernames,omitempty"`
+	CreatedAt            int64    `protobuf:"varint,5,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Account) Reset()         { *m = Account{} }
+func (m *Account) String() string { return proto.CompactTextString(m) }
+func (*Account) ProtoMessage()    {}
+func (*Account) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{0}
+}
+
+func (m *Account) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Account.Unmarshal(m, b)
+}
+func (m *Account) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Account.Marshal(b, m, deterministic)
+}
+func (m *Account) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Account.Merge(m, src)
+}
+func (m *Account) XXX_Size() int {
+	return xxx_messageInfo_Account.Size(m)
+}
+func (m *Account) XXX_DiscardUnknown() {
+	xxx_messageInfo_Account.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Account proto.InternalMessageInfo
+
+func (m *Account) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *Account) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Account) GetPrincipals() []string {
+	if m != nil {
+		return m.Principals
+	}
+	return nil
+}
+
+func (m *Account) GetDeviceUsernames() []string {
+	if m != nil {
+		return m.DeviceUsernames
+	}
+	return nil
+}
+
+func (m *Account) GetCreatedAt() int64 {
+	if m != nil {
+		return m.CreatedAt
+	}
+	return 0
+}
+
+type AccountSet struct {
+	Accounts             []*Account `protobuf:"bytes,1,rep,name=Accounts,proto3" json:"Accounts,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *AccountSet) Reset()         { *m = AccountSet{} }
+func (m *AccountSet) String() string { return proto.CompactTextString(m) }
+func (*AccountSet) ProtoMessage()    {}
+func (*AccountSet) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{1}
+}
+
+func (m *AccountSet) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AccountSet.Unmarshal(m, b)
+}
+func (m *AccountSet) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AccountSet.Marshal(b, m, deterministic)
+}
+func (m *AccountSet) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AccountSet.Merge(m, src)
+}
+func (m *AccountSet) XXX_Size() int {
+	return xxx_messageInfo_AccountSet.Size(m)
+}
+func (m *AccountSet) XXX_DiscardUnknown() {
+	xxx_messageInfo_AccountSet.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AccountSet proto.InternalMessageInfo
+
+func (m *AccountSet) GetAccounts() []*Account {
+	if m != nil {
+		return m.Accounts
+	}
+	return nil
+}
+
 type DeviceSet struct {
 	Devices              []*Device `protobuf:"bytes,1,rep,name=Devices,proto3" json:"Devices,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
@@ -35,7 +145,7 @@ func (m *DeviceSet) Reset()         { *m = DeviceSet{} }
 func (m *DeviceSet) String() string { return proto.CompactTextString(m) }
 func (*DeviceSet) ProtoMessage()    {}
 func (*DeviceSet) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{0}
+	return fileDescriptor_efc1ff1bbf92a481, []int{2}
 }
 
 func (m *DeviceSet) XXX_Unmarshal(b []byte) error {
@@ -79,7 +189,7 @@ func (m *Device) Reset()         { *m = Device{} }
 func (m *Device) String() string { return proto.CompactTextString(m) }
 func (*Device) ProtoMessage()    {}
 func (*Device) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{1}
+	return fileDescriptor_efc1ff1bbf92a481, []int{3}
 }
 
 func (m *Device) XXX_Unmarshal(b []byte) error {
@@ -156,7 +266,7 @@ func (m *CreateDeviceRequest) Reset()         { *m = CreateDeviceRequest{} }
 func (m *CreateDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateDeviceRequest) ProtoMessage()    {}
 func (*CreateDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{2}
+	return fileDescriptor_efc1ff1bbf92a481, []int{4}
 }
 
 func (m *CreateDeviceRequest) XXX_Unmarshal(b []byte) error {
@@ -216,7 +326,7 @@ func (m *CreateDeviceResponse) Reset()         { *m = CreateDeviceResponse{} }
 func (m *CreateDeviceResponse) String() string { return proto.CompactTextString(m) }
 func (*CreateDeviceResponse) ProtoMessage()    {}
 func (*CreateDeviceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{3}
+	return fileDescriptor_efc1ff1bbf92a481, []int{5}
 }
 
 func (m *CreateDeviceResponse) XXX_Unmarshal(b []byte) error {
@@ -256,7 +366,7 @@ func (m *DeleteDeviceRequest) Reset()         { *m = DeleteDeviceRequest{} }
 func (m *DeleteDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteDeviceRequest) ProtoMessage()    {}
 func (*DeleteDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{4}
+	return fileDescriptor_efc1ff1bbf92a481, []int{6}
 }
 
 func (m *DeleteDeviceRequest) XXX_Unmarshal(b []byte) error {
@@ -302,7 +412,7 @@ func (m *DeleteDeviceResponse) Reset()         { *m = DeleteDeviceResponse{} }
 func (m *DeleteDeviceResponse) String() string { return proto.CompactTextString(m) }
 func (*DeleteDeviceResponse) ProtoMessage()    {}
 func (*DeleteDeviceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{5}
+	return fileDescriptor_efc1ff1bbf92a481, []int{7}
 }
 
 func (m *DeleteDeviceResponse) XXX_Unmarshal(b []byte) error {
@@ -341,7 +451,7 @@ func (m *ListDevicesRequest) Reset()         { *m = ListDevicesRequest{} }
 func (m *ListDevicesRequest) String() string { return proto.CompactTextString(m) }
 func (*ListDevicesRequest) ProtoMessage()    {}
 func (*ListDevicesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{6}
+	return fileDescriptor_efc1ff1bbf92a481, []int{8}
 }
 
 func (m *ListDevicesRequest) XXX_Unmarshal(b []byte) error {
@@ -380,7 +490,7 @@ func (m *ListDevicesResponse) Reset()         { *m = ListDevicesResponse{} }
 func (m *ListDevicesResponse) String() string { return proto.CompactTextString(m) }
 func (*ListDevicesResponse) ProtoMessage()    {}
 func (*ListDevicesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{7}
+	return fileDescriptor_efc1ff1bbf92a481, []int{9}
 }
 
 func (m *ListDevicesResponse) XXX_Unmarshal(b []byte) error {
@@ -420,7 +530,7 @@ func (m *GetDeviceRequest) Reset()         { *m = GetDeviceRequest{} }
 func (m *GetDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*GetDeviceRequest) ProtoMessage()    {}
 func (*GetDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{8}
+	return fileDescriptor_efc1ff1bbf92a481, []int{10}
 }
 
 func (m *GetDeviceRequest) XXX_Unmarshal(b []byte) error {
@@ -466,7 +576,7 @@ func (m *GetDeviceResponse) Reset()         { *m = GetDeviceResponse{} }
 func (m *GetDeviceResponse) String() string { return proto.CompactTextString(m) }
 func (*GetDeviceResponse) ProtoMessage()    {}
 func (*GetDeviceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{9}
+	return fileDescriptor_efc1ff1bbf92a481, []int{11}
 }
 
 func (m *GetDeviceResponse) XXX_Unmarshal(b []byte) error {
@@ -506,7 +616,7 @@ func (m *EnableDeviceRequest) Reset()         { *m = EnableDeviceRequest{} }
 func (m *EnableDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*EnableDeviceRequest) ProtoMessage()    {}
 func (*EnableDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{10}
+	return fileDescriptor_efc1ff1bbf92a481, []int{12}
 }
 
 func (m *EnableDeviceRequest) XXX_Unmarshal(b []byte) error {
@@ -551,7 +661,7 @@ func (m *EnableDeviceResponse) Reset()         { *m = EnableDeviceResponse{} }
 func (m *EnableDeviceResponse) String() string { return proto.CompactTextString(m) }
 func (*EnableDeviceResponse) ProtoMessage()    {}
 func (*EnableDeviceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{11}
+	return fileDescriptor_efc1ff1bbf92a481, []int{13}
 }
 
 func (m *EnableDeviceResponse) XXX_Unmarshal(b []byte) error {
@@ -584,7 +694,7 @@ func (m *DisableDeviceRequest) Reset()         { *m = DisableDeviceRequest{} }
 func (m *DisableDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*DisableDeviceRequest) ProtoMessage()    {}
 func (*DisableDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{12}
+	return fileDescriptor_efc1ff1bbf92a481, []int{14}
 }
 
 func (m *DisableDeviceRequest) XXX_Unmarshal(b []byte) error {
@@ -629,7 +739,7 @@ func (m *DisableDeviceResponse) Reset()         { *m = DisableDeviceResponse{} }
 func (m *DisableDeviceResponse) String() string { return proto.CompactTextString(m) }
 func (*DisableDeviceResponse) ProtoMessage()    {}
 func (*DisableDeviceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{13}
+	return fileDescriptor_efc1ff1bbf92a481, []int{15}
 }
 
 func (m *DisableDeviceResponse) XXX_Unmarshal(b []byte) error {
@@ -663,7 +773,7 @@ func (m *ChangeDevicePasswordRequest) Reset()         { *m = ChangeDevicePasswor
 func (m *ChangeDevicePasswordRequest) String() string { return proto.CompactTextString(m) }
 func (*ChangeDevicePasswordRequest) ProtoMessage()    {}
 func (*ChangeDevicePasswordRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{14}
+	return fileDescriptor_efc1ff1bbf92a481, []int{16}
 }
 
 func (m *ChangeDevicePasswordRequest) XXX_Unmarshal(b []byte) error {
@@ -715,7 +825,7 @@ func (m *ChangeDevicePasswordResponse) Reset()         { *m = ChangeDevicePasswo
 func (m *ChangeDevicePasswordResponse) String() string { return proto.CompactTextString(m) }
 func (*ChangeDevicePasswordResponse) ProtoMessage()    {}
 func (*ChangeDevicePasswordResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{15}
+	return fileDescriptor_efc1ff1bbf92a481, []int{17}
 }
 
 func (m *ChangeDevicePasswordResponse) XXX_Unmarshal(b []byte) error {
@@ -736,6 +846,240 @@ func (m *ChangeDevicePasswordResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ChangeDevicePasswordResponse proto.InternalMessageInfo
 
+type CreateAccountRequest struct {
+	Name                 string   `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
+	Principals           []string `protobuf:"bytes,2,rep,name=Principals,proto3" json:"Principals,omitempty"`
+	DeviceUsernames      []string `protobuf:"bytes,3,rep,name=DeviceUsernames,proto3" json:"DeviceUsernames,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateAccountRequest) Reset()         { *m = CreateAccountRequest{} }
+func (m *CreateAccountRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateAccountRequest) ProtoMessage()    {}
+func (*CreateAccountRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{18}
+}
+
+func (m *CreateAccountRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateAccountRequest.Unmarshal(m, b)
+}
+func (m *CreateAccountRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateAccountRequest.Marshal(b, m, deterministic)
+}
+func (m *CreateAccountRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateAccountRequest.Merge(m, src)
+}
+func (m *CreateAccountRequest) XXX_Size() int {
+	return xxx_messageInfo_CreateAccountRequest.Size(m)
+}
+func (m *CreateAccountRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateAccountRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateAccountRequest proto.InternalMessageInfo
+
+func (m *CreateAccountRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *CreateAccountRequest) GetPrincipals() []string {
+	if m != nil {
+		return m.Principals
+	}
+	return nil
+}
+
+func (m *CreateAccountRequest) GetDeviceUsernames() []string {
+	if m != nil {
+		return m.DeviceUsernames
+	}
+	return nil
+}
+
+type CreateAccountResponse struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateAccountResponse) Reset()         { *m = CreateAccountResponse{} }
+func (m *CreateAccountResponse) String() string { return proto.CompactTextString(m) }
+func (*CreateAccountResponse) ProtoMessage()    {}
+func (*CreateAccountResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{19}
+}
+
+func (m *CreateAccountResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateAccountResponse.Unmarshal(m, b)
+}
+func (m *CreateAccountResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateAccountResponse.Marshal(b, m, deterministic)
+}
+func (m *CreateAccountResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateAccountResponse.Merge(m, src)
+}
+func (m *CreateAccountResponse) XXX_Size() int {
+	return xxx_messageInfo_CreateAccountResponse.Size(m)
+}
+func (m *CreateAccountResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateAccountResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateAccountResponse proto.InternalMessageInfo
+
+func (m *CreateAccountResponse) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+type DeleteAccountRequest struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteAccountRequest) Reset()         { *m = DeleteAccountRequest{} }
+func (m *DeleteAccountRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteAccountRequest) ProtoMessage()    {}
+func (*DeleteAccountRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{20}
+}
+
+func (m *DeleteAccountRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteAccountRequest.Unmarshal(m, b)
+}
+func (m *DeleteAccountRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteAccountRequest.Marshal(b, m, deterministic)
+}
+func (m *DeleteAccountRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteAccountRequest.Merge(m, src)
+}
+func (m *DeleteAccountRequest) XXX_Size() int {
+	return xxx_messageInfo_DeleteAccountRequest.Size(m)
+}
+func (m *DeleteAccountRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteAccountRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteAccountRequest proto.InternalMessageInfo
+
+func (m *DeleteAccountRequest) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+type DeleteAccountResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteAccountResponse) Reset()         { *m = DeleteAccountResponse{} }
+func (m *DeleteAccountResponse) String() string { return proto.CompactTextString(m) }
+func (*DeleteAccountResponse) ProtoMessage()    {}
+func (*DeleteAccountResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{21}
+}
+
+func (m *DeleteAccountResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteAccountResponse.Unmarshal(m, b)
+}
+func (m *DeleteAccountResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteAccountResponse.Marshal(b, m, deterministic)
+}
+func (m *DeleteAccountResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteAccountResponse.Merge(m, src)
+}
+func (m *DeleteAccountResponse) XXX_Size() int {
+	return xxx_messageInfo_DeleteAccountResponse.Size(m)
+}
+func (m *DeleteAccountResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteAccountResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteAccountResponse proto.InternalMessageInfo
+
+type ListAccountsRequest struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListAccountsRequest) Reset()         { *m = ListAccountsRequest{} }
+func (m *ListAccountsRequest) String() string { return proto.CompactTextString(m) }
+func (*ListAccountsRequest) ProtoMessage()    {}
+func (*ListAccountsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{22}
+}
+
+func (m *ListAccountsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListAccountsRequest.Unmarshal(m, b)
+}
+func (m *ListAccountsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListAccountsRequest.Marshal(b, m, deterministic)
+}
+func (m *ListAccountsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListAccountsRequest.Merge(m, src)
+}
+func (m *ListAccountsRequest) XXX_Size() int {
+	return xxx_messageInfo_ListAccountsRequest.Size(m)
+}
+func (m *ListAccountsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListAccountsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListAccountsRequest proto.InternalMessageInfo
+
+type ListAccountsResponse struct {
+	Accounts             []*Account `protobuf:"bytes,1,rep,name=Accounts,proto3" json:"Accounts,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *ListAccountsResponse) Reset()         { *m = ListAccountsResponse{} }
+func (m *ListAccountsResponse) String() string { return proto.CompactTextString(m) }
+func (*ListAccountsResponse) ProtoMessage()    {}
+func (*ListAccountsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{23}
+}
+
+func (m *ListAccountsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListAccountsResponse.Unmarshal(m, b)
+}
+func (m *ListAccountsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListAccountsResponse.Marshal(b, m, deterministic)
+}
+func (m *ListAccountsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListAccountsResponse.Merge(m, src)
+}
+func (m *ListAccountsResponse) XXX_Size() int {
+	return xxx_messageInfo_ListAccountsResponse.Size(m)
+}
+func (m *ListAccountsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListAccountsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListAccountsResponse proto.InternalMessageInfo
+
+func (m *ListAccountsResponse) GetAccounts() []*Account {
+	if m != nil {
+		return m.Accounts
+	}
+	return nil
+}
+
 type ShutdownRequest struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -746,7 +1090,7 @@ func (m *ShutdownRequest) Reset()         { *m = ShutdownRequest{} }
 func (m *ShutdownRequest) String() string { return proto.CompactTextString(m) }
 func (*ShutdownRequest) ProtoMessage()    {}
 func (*ShutdownRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{16}
+	return fileDescriptor_efc1ff1bbf92a481, []int{24}
 }
 
 func (m *ShutdownRequest) XXX_Unmarshal(b []byte) error {
@@ -777,7 +1121,7 @@ func (m *ShutdownResponse) Reset()         { *m = ShutdownResponse{} }
 func (m *ShutdownResponse) String() string { return proto.CompactTextString(m) }
 func (*ShutdownResponse) ProtoMessage()    {}
 func (*ShutdownResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{17}
+	return fileDescriptor_efc1ff1bbf92a481, []int{25}
 }
 
 func (m *ShutdownResponse) XXX_Unmarshal(b []byte) error {
@@ -810,7 +1154,7 @@ func (m *VespiaryEventAttribute) Reset()         { *m = VespiaryEventAttribute{}
 func (m *VespiaryEventAttribute) String() string { return proto.CompactTextString(m) }
 func (*VespiaryEventAttribute) ProtoMessage()    {}
 func (*VespiaryEventAttribute) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{18}
+	return fileDescriptor_efc1ff1bbf92a481, []int{26}
 }
 
 func (m *VespiaryEventAttribute) XXX_Unmarshal(b []byte) error {
@@ -859,7 +1203,7 @@ func (m *VespiaryAuditEvent) Reset()         { *m = VespiaryAuditEvent{} }
 func (m *VespiaryAuditEvent) String() string { return proto.CompactTextString(m) }
 func (*VespiaryAuditEvent) ProtoMessage()    {}
 func (*VespiaryAuditEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{19}
+	return fileDescriptor_efc1ff1bbf92a481, []int{27}
 }
 
 func (m *VespiaryAuditEvent) XXX_Unmarshal(b []byte) error {
@@ -919,7 +1263,7 @@ func (m *PutVespiaryEventRequest) Reset()         { *m = PutVespiaryEventRequest
 func (m *PutVespiaryEventRequest) String() string { return proto.CompactTextString(m) }
 func (*PutVespiaryEventRequest) ProtoMessage()    {}
 func (*PutVespiaryEventRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{20}
+	return fileDescriptor_efc1ff1bbf92a481, []int{28}
 }
 
 func (m *PutVespiaryEventRequest) XXX_Unmarshal(b []byte) error {
@@ -957,7 +1301,7 @@ func (m *PutVespiaryEventsResponse) Reset()         { *m = PutVespiaryEventsResp
 func (m *PutVespiaryEventsResponse) String() string { return proto.CompactTextString(m) }
 func (*PutVespiaryEventsResponse) ProtoMessage()    {}
 func (*PutVespiaryEventsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{21}
+	return fileDescriptor_efc1ff1bbf92a481, []int{29}
 }
 
 func (m *PutVespiaryEventsResponse) XXX_Unmarshal(b []byte) error {
@@ -979,6 +1323,8 @@ func (m *PutVespiaryEventsResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_PutVespiaryEventsResponse proto.InternalMessageInfo
 
 func init() {
+	proto.RegisterType((*Account)(nil), "api.Account")
+	proto.RegisterType((*AccountSet)(nil), "api.AccountSet")
 	proto.RegisterType((*DeviceSet)(nil), "api.DeviceSet")
 	proto.RegisterType((*Device)(nil), "api.Device")
 	proto.RegisterType((*CreateDeviceRequest)(nil), "api.CreateDeviceRequest")
@@ -995,6 +1341,12 @@ func init() {
 	proto.RegisterType((*DisableDeviceResponse)(nil), "api.DisableDeviceResponse")
 	proto.RegisterType((*ChangeDevicePasswordRequest)(nil), "api.ChangeDevicePasswordRequest")
 	proto.RegisterType((*ChangeDevicePasswordResponse)(nil), "api.ChangeDevicePasswordResponse")
+	proto.RegisterType((*CreateAccountRequest)(nil), "api.CreateAccountRequest")
+	proto.RegisterType((*CreateAccountResponse)(nil), "api.CreateAccountResponse")
+	proto.RegisterType((*DeleteAccountRequest)(nil), "api.DeleteAccountRequest")
+	proto.RegisterType((*DeleteAccountResponse)(nil), "api.DeleteAccountResponse")
+	proto.RegisterType((*ListAccountsRequest)(nil), "api.ListAccountsRequest")
+	proto.RegisterType((*ListAccountsResponse)(nil), "api.ListAccountsResponse")
 	proto.RegisterType((*ShutdownRequest)(nil), "api.ShutdownRequest")
 	proto.RegisterType((*ShutdownResponse)(nil), "api.ShutdownResponse")
 	proto.RegisterType((*VespiaryEventAttribute)(nil), "api.VespiaryEventAttribute")
@@ -1006,50 +1358,61 @@ func init() {
 func init() { proto.RegisterFile("vespiary.proto", fileDescriptor_efc1ff1bbf92a481) }
 
 var fileDescriptor_efc1ff1bbf92a481 = []byte{
-	// 687 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x56, 0x4d, 0x4f, 0xdb, 0x40,
-	0x10, 0xad, 0xe3, 0x90, 0x26, 0x13, 0x4a, 0x61, 0x48, 0x82, 0x31, 0x08, 0xa5, 0xae, 0x5a, 0x45,
-	0x3d, 0x50, 0x29, 0xbd, 0xd0, 0xc2, 0x81, 0x28, 0xa1, 0x15, 0xa5, 0xa2, 0xc8, 0x20, 0x2e, 0x3d,
-	0x19, 0x32, 0x2a, 0x96, 0x82, 0x93, 0x7a, 0x37, 0x89, 0xf8, 0x1f, 0xbd, 0xf5, 0xaf, 0xf6, 0x50,
-	0x79, 0x3d, 0x4e, 0x6c, 0xb3, 0x41, 0x94, 0x9b, 0xe7, 0x63, 0xdf, 0x9b, 0xd9, 0x9d, 0x37, 0x32,
-	0xac, 0x4c, 0x48, 0x8c, 0x7c, 0x2f, 0xbc, 0xdb, 0x1d, 0x85, 0x43, 0x39, 0x44, 0xd3, 0x1b, 0xf9,
-	0x4e, 0x1b, 0x2a, 0x3d, 0x9a, 0xf8, 0xd7, 0x74, 0x4e, 0x12, 0xdf, 0xc0, 0xf3, 0xd8, 0x10, 0x96,
-	0xd1, 0x34, 0x5b, 0xd5, 0x76, 0x75, 0xd7, 0x1b, 0xf9, 0xbb, 0xb1, 0xcf, 0x4d, 0x62, 0xce, 0x6f,
-	0x03, 0x4a, 0xf1, 0x37, 0xd6, 0x60, 0xe9, 0xfb, 0x34, 0xa0, 0xd0, 0x32, 0x9a, 0x46, 0xab, 0xe2,
-	0xc6, 0x06, 0xae, 0x40, 0xe1, 0xb8, 0x67, 0x15, 0x94, 0xab, 0x70, 0xdc, 0x43, 0x84, 0xe2, 0xa9,
-	0x77, 0x4b, 0x96, 0xa9, 0x3c, 0xea, 0x1b, 0x1b, 0x50, 0xea, 0x5c, 0x4b, 0x7f, 0x42, 0x56, 0xb1,
-	0x69, 0xb4, 0xca, 0x2e, 0x5b, 0xb8, 0x0d, 0x95, 0x6e, 0x48, 0x9e, 0xa4, 0x7e, 0x47, 0x5a, 0x4b,
-	0x4d, 0xa3, 0x65, 0xba, 0x73, 0x07, 0xda, 0x50, 0x3e, 0xf3, 0x84, 0x98, 0x0e, 0xc3, 0xbe, 0x55,
-	0x52, 0x68, 0x33, 0xdb, 0x11, 0xb0, 0x1e, 0x27, 0x72, 0xbd, 0xf4, 0x6b, 0x4c, 0x42, 0x2e, 0x28,
-	0x31, 0x29, 0xa9, 0xa0, 0x2d, 0xc9, 0xcc, 0x94, 0x94, 0x26, 0x2d, 0xe6, 0x48, 0xdf, 0x42, 0x2d,
-	0x4b, 0x2a, 0x46, 0xc3, 0x40, 0x10, 0x5f, 0x81, 0x91, 0x5c, 0x81, 0xb3, 0x0f, 0xeb, 0x3d, 0x1a,
-	0xd0, 0xe3, 0x8a, 0xcb, 0xdd, 0x5f, 0x44, 0x92, 0x3d, 0xbc, 0x80, 0xe4, 0x1d, 0xe0, 0x37, 0x5f,
-	0x48, 0x7e, 0xa7, 0x07, 0x39, 0x9c, 0x03, 0x58, 0xcf, 0xe4, 0x32, 0xe4, 0x23, 0x47, 0x60, 0x0f,
-	0x56, 0xbf, 0x90, 0x7c, 0x4a, 0x2f, 0x7b, 0xb0, 0x96, 0x3a, 0xc9, 0xac, 0xaf, 0x93, 0x81, 0x52,
-	0x67, 0x73, 0xa4, 0x1c, 0x8a, 0xae, 0xf0, 0x28, 0xf0, 0xae, 0x06, 0x4f, 0xba, 0xc2, 0x06, 0xd4,
-	0xb2, 0x87, 0x63, 0x66, 0xe7, 0x00, 0x6a, 0x3d, 0x5f, 0x3c, 0x15, 0x75, 0x03, 0xea, 0xb9, 0xd3,
-	0x0c, 0x4b, 0xb0, 0xd5, 0xbd, 0xf1, 0x82, 0x9f, 0xec, 0x4f, 0xc6, 0xe5, 0xbf, 0xd0, 0xb1, 0x09,
-	0xd5, 0x53, 0x9a, 0xce, 0x46, 0x2f, 0x56, 0x4f, 0xda, 0xe5, 0xec, 0xc0, 0xb6, 0x9e, 0x86, 0xcb,
-	0x58, 0x83, 0x97, 0xe7, 0x37, 0x63, 0xd9, 0x1f, 0x4e, 0x03, 0xa6, 0x76, 0x10, 0x56, 0xe7, 0x2e,
-	0x4e, 0x3b, 0x84, 0xc6, 0x25, 0xef, 0x86, 0xa3, 0x09, 0x05, 0xb2, 0x23, 0x65, 0xe8, 0x5f, 0x8d,
-	0x25, 0xe1, 0x2a, 0x98, 0x27, 0x74, 0xc7, 0x65, 0x46, 0x9f, 0x51, 0xe9, 0x97, 0xde, 0x60, 0x9c,
-	0x28, 0x27, 0x36, 0x9c, 0x3f, 0x06, 0x60, 0x02, 0xd1, 0x19, 0xf7, 0x7d, 0xa9, 0x70, 0x22, 0x31,
-	0x5f, 0xf8, 0xb7, 0x24, 0xa4, 0x77, 0x3b, 0x52, 0x20, 0xa6, 0x3b, 0x77, 0x44, 0x7a, 0xbb, 0xa0,
-	0xc0, 0x0b, 0x24, 0x63, 0xb1, 0x15, 0x69, 0xf3, 0xc4, 0x0f, 0x92, 0x86, 0xd5, 0x37, 0xee, 0x03,
-	0xcc, 0xaa, 0x12, 0x56, 0x51, 0x8d, 0xe6, 0x96, 0x9a, 0x12, 0x7d, 0xe5, 0x6e, 0x2a, 0xdd, 0xf9,
-	0x0a, 0x1b, 0x67, 0x63, 0x99, 0x49, 0x4c, 0x5e, 0xe2, 0x3d, 0x94, 0x94, 0x9d, 0x8c, 0xfb, 0x46,
-	0x06, 0x73, 0xde, 0x8a, 0xcb, 0x69, 0xce, 0x16, 0x6c, 0xe6, 0xb1, 0x66, 0xea, 0x69, 0xff, 0x35,
-	0xa1, 0x9c, 0x84, 0xb0, 0x0b, 0xcb, 0xe9, 0xd5, 0x80, 0x96, 0x82, 0xd6, 0xac, 0x28, 0x7b, 0x53,
-	0x13, 0x61, 0x65, 0x74, 0x61, 0x39, 0x2d, 0x7d, 0x06, 0xd1, 0xac, 0x12, 0x06, 0xd1, 0xee, 0x89,
-	0x43, 0xa8, 0xa6, 0xb4, 0x8e, 0x71, 0x8f, 0xf7, 0x37, 0x85, 0x6d, 0xdd, 0x0f, 0x30, 0xc2, 0x27,
-	0xa8, 0xcc, 0x54, 0x8b, 0x75, 0x95, 0x96, 0xd7, 0xbf, 0xdd, 0xc8, 0xbb, 0xe7, 0x2d, 0xa4, 0xa5,
-	0xc7, 0x2d, 0x68, 0xa4, 0xcc, 0x2d, 0xe8, 0x74, 0x8a, 0x9f, 0xe1, 0x45, 0x46, 0x69, 0xc8, 0xed,
-	0x6a, 0xb4, 0x6b, 0xdb, 0xba, 0x10, 0xe3, 0xfc, 0x80, 0x9a, 0x4e, 0x31, 0xd8, 0x8c, 0x9f, 0x60,
-	0xb1, 0x66, 0xed, 0x57, 0x0f, 0x64, 0xf0, 0xf3, 0x77, 0xa0, 0x78, 0x3a, 0xec, 0x13, 0x7e, 0x84,
-	0x72, 0xa2, 0x31, 0xac, 0xa9, 0x63, 0x39, 0x15, 0xda, 0xf5, 0x9c, 0x97, 0x85, 0xf8, 0xac, 0x3d,
-	0x80, 0x7a, 0x66, 0xf8, 0x5c, 0xba, 0x1e, 0x86, 0x7d, 0x0a, 0xf1, 0x1c, 0xd6, 0xee, 0xcd, 0x1d,
-	0x6e, 0x2b, 0x98, 0x05, 0xb3, 0x6d, 0xef, 0x68, 0xa3, 0x62, 0xce, 0x76, 0x55, 0x52, 0x7f, 0x02,
-	0x1f, 0xfe, 0x05, 0x00, 0x00, 0xff, 0xff, 0x39, 0x78, 0x80, 0x1a, 0x1b, 0x08, 0x00, 0x00,
+	// 857 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x56, 0x5b, 0x4f, 0xdb, 0x48,
+	0x14, 0x5e, 0xc7, 0x21, 0x24, 0x27, 0x5c, 0x87, 0x5c, 0x1c, 0x83, 0x50, 0xd6, 0xab, 0xdd, 0x8d,
+	0xf6, 0x81, 0x95, 0x52, 0xa9, 0xa2, 0x85, 0x07, 0x22, 0x02, 0x15, 0xa5, 0xa2, 0xc8, 0x50, 0x5e,
+	0xfa, 0x64, 0x92, 0x51, 0xb1, 0x94, 0xd8, 0xa9, 0x67, 0x92, 0x88, 0xff, 0xd1, 0x3e, 0xf5, 0x57,
+	0xf5, 0x1f, 0x55, 0x1e, 0x9f, 0xf1, 0x8d, 0x09, 0x4a, 0x79, 0xf3, 0x9c, 0xcb, 0x77, 0xce, 0xcc,
+	0xf9, 0xe6, 0x1b, 0xc3, 0xc6, 0x8c, 0xb2, 0x89, 0xeb, 0x04, 0x8f, 0x07, 0x93, 0xc0, 0xe7, 0x3e,
+	0xd1, 0x9d, 0x89, 0x6b, 0x7d, 0xd7, 0x60, 0xb5, 0x37, 0x18, 0xf8, 0x53, 0x8f, 0x93, 0x0d, 0x28,
+	0x5c, 0xf4, 0x0d, 0xad, 0xad, 0x75, 0x2a, 0x76, 0xe1, 0xa2, 0x4f, 0x08, 0x14, 0xaf, 0x9c, 0x31,
+	0x35, 0x0a, 0xc2, 0x22, 0xbe, 0xc9, 0x3e, 0xc0, 0x75, 0xe0, 0x7a, 0x03, 0x77, 0xe2, 0x8c, 0x98,
+	0xa1, 0xb7, 0xf5, 0x4e, 0xc5, 0x4e, 0x59, 0x48, 0x07, 0x36, 0xfb, 0x74, 0xe6, 0x0e, 0xe8, 0x27,
+	0x46, 0x03, 0xcf, 0x19, 0x53, 0x66, 0x14, 0x45, 0x50, 0xde, 0x4c, 0xf6, 0xa0, 0x72, 0x1a, 0x50,
+	0x87, 0xd3, 0x61, 0x8f, 0x1b, 0x2b, 0x6d, 0xad, 0xa3, 0xdb, 0x89, 0xc1, 0x7a, 0x0d, 0x80, 0x6d,
+	0xdd, 0x50, 0x4e, 0x3a, 0x50, 0xc6, 0x15, 0x33, 0xb4, 0xb6, 0xde, 0xa9, 0x76, 0xd7, 0x0e, 0x9c,
+	0x89, 0x7b, 0x80, 0x46, 0x3b, 0xf6, 0x5a, 0x5d, 0xa8, 0x44, 0x85, 0xc2, 0xb4, 0xbf, 0x61, 0x35,
+	0x5a, 0xc8, 0xac, 0xaa, 0xc8, 0x8a, 0x6c, 0xb6, 0xf4, 0x59, 0xdf, 0x34, 0x28, 0x45, 0xdf, 0xa4,
+	0x06, 0x2b, 0x1f, 0xe7, 0x1e, 0x0d, 0xf0, 0x14, 0xa2, 0x05, 0x1e, 0x4c, 0xe1, 0xc9, 0xc1, 0xe8,
+	0xa9, 0x83, 0x69, 0x40, 0xa9, 0x37, 0xe0, 0xee, 0x8c, 0x1a, 0xc5, 0xb6, 0xd6, 0x29, 0xdb, 0xb8,
+	0x7a, 0x7e, 0x9b, 0xc4, 0x84, 0xf2, 0xb5, 0xc3, 0xd8, 0xdc, 0x0f, 0x86, 0x46, 0x49, 0xa0, 0xc5,
+	0x6b, 0x8b, 0xc1, 0x4e, 0x14, 0x88, 0xfd, 0xd2, 0xaf, 0x53, 0xca, 0xf8, 0x82, 0x16, 0x55, 0xb3,
+	0x4a, 0x5a, 0xd2, 0x33, 0x2d, 0xa5, 0x8b, 0x16, 0x73, 0x45, 0xff, 0x81, 0x5a, 0xb6, 0x28, 0x9b,
+	0xf8, 0x1e, 0xa3, 0x79, 0x6e, 0x58, 0x47, 0xb0, 0xd3, 0xa7, 0x23, 0xba, 0x5c, 0x73, 0xb9, 0xf3,
+	0x0b, 0x8b, 0x64, 0x93, 0x17, 0x14, 0xf9, 0x0f, 0xc8, 0x07, 0x97, 0x71, 0x9c, 0xd3, 0xb3, 0x35,
+	0xac, 0x63, 0xd8, 0xc9, 0xc4, 0x22, 0xe4, 0x92, 0x14, 0x38, 0x84, 0xad, 0x77, 0x94, 0xbf, 0x64,
+	0x2f, 0x87, 0xb0, 0x9d, 0xca, 0xc4, 0xaa, 0x7f, 0x49, 0x42, 0x89, 0xdc, 0x5c, 0x51, 0x74, 0x85,
+	0x47, 0x78, 0xe6, 0x39, 0xf7, 0xa3, 0x17, 0x1d, 0x61, 0x03, 0x6a, 0xd9, 0xe4, 0xa8, 0xb2, 0x75,
+	0x0c, 0xb5, 0xbe, 0xcb, 0x5e, 0x8a, 0xda, 0x84, 0x7a, 0x2e, 0x1b, 0x61, 0x29, 0xec, 0x9e, 0x3e,
+	0x38, 0xde, 0x17, 0xb4, 0x4b, 0xba, 0xfc, 0x16, 0x3a, 0x69, 0x43, 0xf5, 0x8a, 0xce, 0x63, 0xea,
+	0x45, 0xb7, 0x27, 0x6d, 0xb2, 0xf6, 0x61, 0x4f, 0x5d, 0x06, 0xdb, 0xe0, 0x92, 0x9d, 0xf2, 0xe2,
+	0x63, 0x7d, 0xc9, 0x7e, 0x6d, 0xa1, 0x52, 0x15, 0x96, 0x51, 0x2a, 0x5d, 0xa9, 0x54, 0xd6, 0xbf,
+	0x50, 0xcf, 0x55, 0x5d, 0xc0, 0xd7, 0x98, 0xd7, 0xb9, 0xf6, 0xf2, 0x71, 0xe1, 0x31, 0x67, 0xe3,
+	0x70, 0x7f, 0xf5, 0x88, 0xc4, 0x52, 0xcd, 0x30, 0xdf, 0x3a, 0x81, 0x5a, 0xd6, 0x8c, 0xf5, 0x97,
+	0x97, 0xc5, 0x6d, 0xd8, 0xbc, 0x79, 0x98, 0xf2, 0xa1, 0x3f, 0xf7, 0x24, 0x28, 0x81, 0xad, 0xc4,
+	0x84, 0xf5, 0x4f, 0xa0, 0x71, 0x87, 0x8f, 0xc4, 0xd9, 0x8c, 0x7a, 0xbc, 0xc7, 0x79, 0xe0, 0xde,
+	0x4f, 0x39, 0x25, 0x5b, 0xa0, 0x5f, 0xd2, 0x47, 0xdc, 0x43, 0xf8, 0x19, 0xce, 0xfc, 0xce, 0x19,
+	0x4d, 0xa5, 0xe4, 0x44, 0x0b, 0xeb, 0x87, 0x06, 0x44, 0x42, 0xf4, 0xa6, 0x43, 0x97, 0x0b, 0x9c,
+	0x50, 0x05, 0x6f, 0xdd, 0x31, 0x65, 0xdc, 0x19, 0x4f, 0x04, 0x88, 0x6e, 0x27, 0x86, 0x50, 0xa8,
+	0x6e, 0xa9, 0xe7, 0x78, 0x1c, 0xb1, 0x70, 0x15, 0x8e, 0xf5, 0xd2, 0xf5, 0x24, 0x53, 0xc4, 0x37,
+	0x39, 0x02, 0x88, 0xbb, 0x8a, 0xde, 0x96, 0x6a, 0x77, 0x57, 0xec, 0x5a, 0xdd, 0xb9, 0x9d, 0x0a,
+	0xb7, 0xde, 0x43, 0xf3, 0x7a, 0xca, 0x33, 0x81, 0x72, 0x46, 0xff, 0x43, 0x49, 0xac, 0xe5, 0x49,
+	0x36, 0x33, 0x98, 0xc9, 0x56, 0x6c, 0x0c, 0xb3, 0x76, 0xa1, 0x95, 0xc7, 0x8a, 0x27, 0xd3, 0xfd,
+	0xb9, 0x02, 0x65, 0xe9, 0x22, 0xe7, 0xb0, 0x9e, 0xe1, 0x0f, 0x69, 0x09, 0x6c, 0x15, 0x93, 0x4d,
+	0x53, 0xe5, 0xc2, 0x71, 0x9f, 0xc3, 0x7a, 0x86, 0x36, 0x88, 0xa3, 0xa2, 0x1c, 0xe2, 0x28, 0x59,
+	0x46, 0x4e, 0x61, 0x2d, 0x4d, 0x27, 0x62, 0x88, 0x58, 0x05, 0xf1, 0xcc, 0x96, 0xc2, 0x93, 0x80,
+	0xa4, 0x1f, 0x0a, 0x04, 0x51, 0x3c, 0x58, 0x66, 0x4b, 0xe1, 0x49, 0x40, 0xd2, 0x0f, 0x01, 0x82,
+	0x28, 0x1e, 0x16, 0xb3, 0xa5, 0xf0, 0x20, 0xc8, 0x09, 0x54, 0x53, 0xca, 0x4f, 0x9a, 0x71, 0xcf,
+	0xd9, 0x77, 0xc3, 0x34, 0x9e, 0x3a, 0x10, 0xe1, 0x2d, 0x54, 0x62, 0x0d, 0x27, 0x75, 0x11, 0x96,
+	0x7f, 0x0d, 0xcc, 0x46, 0xde, 0x9c, 0x6c, 0x21, 0x2d, 0xc4, 0xb8, 0x05, 0x85, 0xb0, 0xe3, 0x16,
+	0x54, 0xaa, 0x2d, 0x26, 0x9b, 0xd6, 0x5d, 0x39, 0x59, 0x85, 0x92, 0xcb, 0xc9, 0xaa, 0x64, 0x9a,
+	0x7c, 0x86, 0x9a, 0x4a, 0x3f, 0x49, 0x3b, 0x1a, 0xc1, 0x62, 0x05, 0x37, 0xff, 0x7c, 0x26, 0x02,
+	0x39, 0xdd, 0x83, 0xe2, 0x95, 0x3f, 0xa4, 0xe4, 0x0d, 0x94, 0xa5, 0x70, 0x90, 0x9a, 0x48, 0xcb,
+	0x49, 0x8b, 0x59, 0xcf, 0x59, 0x51, 0x5d, 0xfe, 0xe8, 0x8e, 0xa0, 0x9e, 0xb9, 0x51, 0x36, 0x1d,
+	0xf8, 0xc1, 0x90, 0x06, 0xe4, 0x06, 0xb6, 0x9f, 0x5c, 0x26, 0xb2, 0x27, 0x60, 0x16, 0x5c, 0x58,
+	0x73, 0x5f, 0xe9, 0x65, 0x49, 0xb5, 0xfb, 0x92, 0xf8, 0xcf, 0x7d, 0xf5, 0x2b, 0x00, 0x00, 0xff,
+	0xff, 0x25, 0x44, 0x6f, 0x75, 0xf9, 0x0a, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1064,6 +1427,9 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type VespiaryClient interface {
+	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error)
+	DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...grpc.CallOption) (*DeleteAccountResponse, error)
+	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error)
 	CreateDevice(ctx context.Context, in *CreateDeviceRequest, opts ...grpc.CallOption) (*CreateDeviceResponse, error)
 	DeleteDevice(ctx context.Context, in *DeleteDeviceRequest, opts ...grpc.CallOption) (*DeleteDeviceResponse, error)
 	ListDevices(ctx context.Context, in *ListDevicesRequest, opts ...grpc.CallOption) (*ListDevicesResponse, error)
@@ -1079,6 +1445,33 @@ type vespiaryClient struct {
 
 func NewVespiaryClient(cc *grpc.ClientConn) VespiaryClient {
 	return &vespiaryClient{cc}
+}
+
+func (c *vespiaryClient) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error) {
+	out := new(CreateAccountResponse)
+	err := c.cc.Invoke(ctx, "/api.Vespiary/CreateAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vespiaryClient) DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...grpc.CallOption) (*DeleteAccountResponse, error) {
+	out := new(DeleteAccountResponse)
+	err := c.cc.Invoke(ctx, "/api.Vespiary/DeleteAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vespiaryClient) ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error) {
+	out := new(ListAccountsResponse)
+	err := c.cc.Invoke(ctx, "/api.Vespiary/ListAccounts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *vespiaryClient) CreateDevice(ctx context.Context, in *CreateDeviceRequest, opts ...grpc.CallOption) (*CreateDeviceResponse, error) {
@@ -1146,6 +1539,9 @@ func (c *vespiaryClient) ChangeDevicePassword(ctx context.Context, in *ChangeDev
 
 // VespiaryServer is the server API for Vespiary service.
 type VespiaryServer interface {
+	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error)
+	DeleteAccount(context.Context, *DeleteAccountRequest) (*DeleteAccountResponse, error)
+	ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error)
 	CreateDevice(context.Context, *CreateDeviceRequest) (*CreateDeviceResponse, error)
 	DeleteDevice(context.Context, *DeleteDeviceRequest) (*DeleteDeviceResponse, error)
 	ListDevices(context.Context, *ListDevicesRequest) (*ListDevicesResponse, error)
@@ -1159,6 +1555,15 @@ type VespiaryServer interface {
 type UnimplementedVespiaryServer struct {
 }
 
+func (*UnimplementedVespiaryServer) CreateAccount(ctx context.Context, req *CreateAccountRequest) (*CreateAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
+}
+func (*UnimplementedVespiaryServer) DeleteAccount(ctx context.Context, req *DeleteAccountRequest) (*DeleteAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccount not implemented")
+}
+func (*UnimplementedVespiaryServer) ListAccounts(ctx context.Context, req *ListAccountsRequest) (*ListAccountsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAccounts not implemented")
+}
 func (*UnimplementedVespiaryServer) CreateDevice(ctx context.Context, req *CreateDeviceRequest) (*CreateDeviceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateDevice not implemented")
 }
@@ -1183,6 +1588,60 @@ func (*UnimplementedVespiaryServer) ChangeDevicePassword(ctx context.Context, re
 
 func RegisterVespiaryServer(s *grpc.Server, srv VespiaryServer) {
 	s.RegisterService(&_Vespiary_serviceDesc, srv)
+}
+
+func _Vespiary_CreateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VespiaryServer).CreateAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Vespiary/CreateAccount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VespiaryServer).CreateAccount(ctx, req.(*CreateAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Vespiary_DeleteAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VespiaryServer).DeleteAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Vespiary/DeleteAccount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VespiaryServer).DeleteAccount(ctx, req.(*DeleteAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Vespiary_ListAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAccountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VespiaryServer).ListAccounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Vespiary/ListAccounts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VespiaryServer).ListAccounts(ctx, req.(*ListAccountsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Vespiary_CreateDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -1315,6 +1774,18 @@ var _Vespiary_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "api.Vespiary",
 	HandlerType: (*VespiaryServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateAccount",
+			Handler:    _Vespiary_CreateAccount_Handler,
+		},
+		{
+			MethodName: "DeleteAccount",
+			Handler:    _Vespiary_DeleteAccount_Handler,
+		},
+		{
+			MethodName: "ListAccounts",
+			Handler:    _Vespiary_ListAccounts_Handler,
+		},
 		{
 			MethodName: "CreateDevice",
 			Handler:    _Vespiary_CreateDevice_Handler,
