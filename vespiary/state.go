@@ -15,6 +15,10 @@ const (
 	accountsTable = "accounts"
 )
 
+var (
+	ErrAccountDoesNotExist = errors.New("account does not exist")
+)
+
 type memDBStore struct {
 	db *memdb.MemDB
 }
@@ -117,6 +121,9 @@ func NewStateStore() *memDBStore {
 func (s *memDBStore) CreateDevice(device *api.Device) error {
 	tx := s.db.Txn(true)
 	defer tx.Abort()
+	if _, err := s.accountByID(tx, device.Owner); err != nil {
+		return ErrAccountDoesNotExist
+	}
 	err := tx.Insert(devicesTable, device)
 	if err != nil {
 		return err
@@ -137,6 +144,9 @@ func (s *memDBStore) CreateAccount(account *api.Account) error {
 func (s *memDBStore) DeleteDevice(id, owner string) error {
 	tx := s.db.Txn(true)
 	defer tx.Abort()
+	return s.deleteDevice(tx, id, owner)
+}
+func (s *memDBStore) deleteDevice(tx *memdb.Txn, id, owner string) error {
 	err := tx.Delete(devicesTable, &api.Device{ID: id, Owner: owner})
 	if err != nil {
 		return err
@@ -151,12 +161,25 @@ func (s *memDBStore) DeleteAccount(id string) error {
 	if err != nil {
 		return err
 	}
+	devices, err := s.devicesByOwner(tx, id)
+	if err != nil {
+		return err
+	}
+	for _, device := range devices {
+		err := s.deleteDevice(tx, device.ID, device.Owner)
+		if err != nil {
+			return err
+		}
+	}
 	tx.Commit()
 	return nil
 }
 func (s *memDBStore) DevicesByOwner(owner string) ([]*api.Device, error) {
 	tx := s.db.Txn(false)
 	defer tx.Abort()
+	return s.devicesByOwner(tx, owner)
+}
+func (s *memDBStore) devicesByOwner(tx *memdb.Txn, owner string) ([]*api.Device, error) {
 	iterator, err := tx.Get(devicesTable, "owner", owner)
 	if err != nil {
 		return nil, err
@@ -220,6 +243,9 @@ func (s *memDBStore) ListAccounts() ([]*api.Account, error) {
 func (s *memDBStore) AccountByID(id string) (*api.Account, error) {
 	tx := s.db.Txn(false)
 	defer tx.Abort()
+	return s.accountByID(tx, id)
+}
+func (s *memDBStore) accountByID(tx *memdb.Txn, id string) (*api.Account, error) {
 	elt, err := tx.First(accountsTable, "id", id)
 	if err != nil {
 		return nil, err

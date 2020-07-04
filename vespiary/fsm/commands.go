@@ -15,6 +15,10 @@ import (
 	"github.com/vx-labs/wasp/cluster/raft"
 )
 
+var (
+	ErrAccountDoesNotExist = errors.New("account does not exist")
+)
+
 type State interface {
 	DeleteDevice(id, owner string) error
 	CreateDevice(device *api.Device) error
@@ -23,6 +27,7 @@ type State interface {
 	ChangeDevicePassword(id, owner, password string) error
 	CreateAccount(account *api.Account) error
 	DeleteAccount(id string) error
+	AccountByID(id string) (*api.Account, error)
 }
 
 func decode(payload []byte) ([]*StateTransition, error) {
@@ -185,6 +190,9 @@ func (f *FSM) ChangeDevicePassword(ctx context.Context, id, owner, password stri
 	}})
 }
 func (f *FSM) CreateDevice(ctx context.Context, owner, name, password string, active bool) (string, error) {
+	if _, err := f.state.AccountByID(owner); err != nil {
+		return "", ErrAccountDoesNotExist
+	}
 	id := uuid.New().String()
 	now := time.Now().UnixNano()
 	return id, f.commit(ctx, &StateTransition{Event: &StateTransition_DeviceCreated{
