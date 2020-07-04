@@ -26,6 +26,7 @@ type State interface {
 	ListAccounts() ([]*api.Account, error)
 	AccountByName(name string) (*api.Account, error)
 	AccountByID(id string) (*api.Account, error)
+	AccountByPrincipal(principal string) (*api.Account, error)
 }
 
 func NewServer(fsm FSM, state State) *server {
@@ -119,7 +120,6 @@ func (s *server) CreateAccount(ctx context.Context, input *api.CreateAccountRequ
 	if err == nil {
 		return nil, status.Error(codes.AlreadyExists, "account already exists")
 	}
-
 	id, err := s.fsm.CreateAccount(ctx, input.Name, input.Principals, input.DeviceUsernames)
 	if err != nil {
 		return nil, err
@@ -148,5 +148,13 @@ func (s *server) ListAccounts(ctx context.Context, input *api.ListAccountsReques
 		return nil, err
 	}
 	return &api.ListAccountsResponse{Accounts: accounts}, nil
+
+}
+func (s *server) GetAccountByPrincipal(ctx context.Context, input *api.GetAccountByPrincipalRequest) (*api.GetAccountByPrincipalResponse, error) {
+	accounts, err := s.state.AccountByPrincipal(input.Principal)
+	if err != nil {
+		return nil, err
+	}
+	return &api.GetAccountByPrincipalResponse{Account: accounts}, nil
 
 }

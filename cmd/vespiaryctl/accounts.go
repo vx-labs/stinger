@@ -64,6 +64,26 @@ func Accounts(ctx context.Context, config *viper.Viper) *cobra.Command {
 		},
 	}
 	cmd.AddCommand(list)
+	byPrincipal := &cobra.Command{
+		Use: "by-principal",
+		Run: func(cmd *cobra.Command, args []string) {
+			conn, l := mustDial(ctx, cmd, config)
+			out, err := api.NewVespiaryClient(conn).GetAccountByPrincipal(ctx, &api.GetAccountByPrincipalRequest{Principal: args[0]})
+			if err != nil {
+				l.Fatal("failed to list accounts", zap.Error(err))
+			}
+			account := out.Account
+			table := getTable([]string{"ID", "Name", "Principals", "Usernames"}, cmd.OutOrStdout())
+			table.Append([]string{
+				account.ID, account.Name,
+				strings.Join(account.Principals, ", "),
+				strings.Join(account.DeviceUsernames, ", ")})
+
+			table.Render()
+
+		},
+	}
+	cmd.AddCommand(byPrincipal)
 
 	delete := (&cobra.Command{
 		Use: "delete",

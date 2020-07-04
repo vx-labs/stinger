@@ -139,7 +139,6 @@ func (f *FSM) CreateAccount(ctx context.Context, name string, principals, device
 	}
 	id := uuid.New().String()
 	now := time.Now().UnixNano()
-
 	return id, f.commit(ctx, &StateTransition{Event: &StateTransition_AccountCreated{
 		AccountCreated: &AccountCreated{
 			ID:              id,
@@ -227,7 +226,7 @@ func (f *FSM) Apply(index uint64, b []byte) error {
 			err = f.state.CreateAccount(&api.Account{
 				ID:              in.ID,
 				Name:            in.Name,
-				Principals:      in.DeviceUsernames,
+				Principals:      in.Principals,
 				DeviceUsernames: in.DeviceUsernames,
 				CreatedAt:       in.CreatedAt,
 			})

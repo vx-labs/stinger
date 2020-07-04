@@ -76,6 +76,12 @@ message DeleteAccountResponse {}
 
 message ListAccountsRequest {};
 message ListAccountsResponse { repeated Account Accounts = 1; };
+message GetAccountByPrincipalRequest {
+  string Principal = 1;
+}
+message GetAccountByPrincipalResponse {
+  Account Account = 1;
+}
 
 service Vespiary {
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
@@ -89,6 +95,7 @@ service Vespiary {
   rpc DisableDevice(DisableDeviceRequest) returns (DisableDeviceResponse);
   rpc ChangeDevicePassword(ChangeDevicePasswordRequest)
       returns (ChangeDevicePasswordResponse);
+  rpc GetAccountByPrincipal(GetAccountByPrincipalRequest) returns (GetAccountByPrincipalResponse);
 }
 
 message ShutdownRequest {}
