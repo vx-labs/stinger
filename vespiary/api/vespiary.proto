@@ -2,9 +2,16 @@ syntax = "proto3";
 
 package api;
 
-message DeviceSet {
-  repeated Device Devices = 1;
+message Account {
+  string ID = 1; // uuid
+  string Name = 2;
+  repeated string Principals = 3;      // auth0 user id
+  repeated string DeviceUsernames = 4; // the old 'vx:psk'
+  int64 CreatedAt = 5;
 }
+message AccountSet { repeated Account Accounts = 1; }
+
+message DeviceSet { repeated Device Devices = 1; }
 message Device {
   string Owner = 1;
   string ID = 2;
@@ -56,14 +63,39 @@ message ChangeDevicePasswordRequest {
 }
 message ChangeDevicePasswordResponse {}
 
+message CreateAccountRequest {
+  string Name = 1;
+  repeated string Principals = 2;
+  repeated string DeviceUsernames = 3;
+}
+
+message CreateAccountResponse { string ID = 1; }
+message DeleteAccountRequest { string ID = 1; }
+
+message DeleteAccountResponse {}
+
+message ListAccountsRequest {};
+message ListAccountsResponse { repeated Account Accounts = 1; };
+message GetAccountByPrincipalRequest {
+  string Principal = 1;
+}
+message GetAccountByPrincipalResponse {
+  Account Account = 1;
+}
+
 service Vespiary {
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
+  rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse);
+  rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse);
   rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
   rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse);
   rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
   rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse);
   rpc EnableDevice(EnableDeviceRequest) returns (EnableDeviceResponse);
   rpc DisableDevice(DisableDeviceRequest) returns (DisableDeviceResponse);
-  rpc ChangeDevicePassword(ChangeDevicePasswordRequest) returns (ChangeDevicePasswordResponse);
+  rpc ChangeDevicePassword(ChangeDevicePasswordRequest)
+      returns (ChangeDevicePasswordResponse);
+  rpc GetAccountByPrincipal(GetAccountByPrincipalRequest) returns (GetAccountByPrincipalResponse);
 }
 
 message ShutdownRequest {}
@@ -88,5 +120,6 @@ message PutVespiaryEventRequest { repeated VespiaryAuditEvent Events = 1; }
 message PutVespiaryEventsResponse {}
 
 service VespiaryAuditRecorder {
-  rpc PutVespiaryEvents(PutVespiaryEventRequest) returns (PutVespiaryEventsResponse) {}
+  rpc PutVespiaryEvents(PutVespiaryEventRequest)
+      returns (PutVespiaryEventsResponse) {}
 }
