@@ -226,7 +226,7 @@ func (s *memDBStore) AccountByPrincipal(principal string) (*api.Account, error) 
 	}
 	return elt.(*api.Account), nil
 }
-func (s *memDBStore) AccountBydeviceUsername(deviceUsername string) (*api.Account, error) {
+func (s *memDBStore) AccountByDeviceUsername(deviceUsername string) (*api.Account, error) {
 	tx := s.db.Txn(false)
 	defer tx.Abort()
 	elt, err := tx.First(accountsTable, "deviceUsernames", deviceUsername)

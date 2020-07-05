@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/vx-labs/vespiary/vespiary/api"
+	"github.com/vx-labs/wasp/wasp/auth"
 	"go.uber.org/zap"
 )
 
@@ -103,7 +104,8 @@ func Devices(ctx context.Context, config *viper.Viper) *cobra.Command {
 	cmd.AddCommand(disable)
 
 	delete := (&cobra.Command{
-		Use: "delete",
+		Use:     "delete",
+		Aliases: []string{"rm"},
 		Run: func(cmd *cobra.Command, args []string) {
 			conn, l := mustDial(ctx, cmd, config)
 			_, err := api.NewVespiaryClient(conn).DeleteDevice(ctx, &api.DeleteDeviceRequest{
@@ -118,9 +120,29 @@ func Devices(ctx context.Context, config *viper.Viper) *cobra.Command {
 	delete.Flags().StringP("id", "i", "", "Device ID")
 	delete.Flags().StringP("owner", "o", "", "Device Owner")
 	cmd.AddCommand(delete)
+	changePassword := (&cobra.Command{
+		Use:     "change-password",
+		Aliases: []string{"passwd"},
+		Run: func(cmd *cobra.Command, args []string) {
+			conn, l := mustDial(ctx, cmd, config)
+			_, err := api.NewVespiaryClient(conn).ChangeDevicePassword(ctx, &api.ChangeDevicePasswordRequest{
+				ID:          config.GetString("id"),
+				Owner:       config.GetString("owner"),
+				NewPassword: config.GetString("password"),
+			})
+			if err != nil {
+				l.Fatal("failed to change device password", zap.Error(err))
+			}
+		},
+	})
+	changePassword.Flags().StringP("id", "i", "", "Device ID")
+	changePassword.Flags().StringP("owner", "o", "", "Device Owner")
+	changePassword.Flags().StringP("password", "p", "", "Device new password")
+	cmd.AddCommand(changePassword)
 
 	list := (&cobra.Command{
-		Use: "list",
+		Use:     "list",
+		Aliases: []string{"ls"},
 		Run: func(cmd *cobra.Command, args []string) {
 			conn, l := mustDial(ctx, cmd, config)
 			resp, err := api.NewVespiaryClient(conn).ListDevices(ctx, &api.ListDevicesRequest{
@@ -139,6 +161,33 @@ func Devices(ctx context.Context, config *viper.Viper) *cobra.Command {
 	list.Flags().StringP("owner", "o", "", "Device Owner")
 
 	cmd.AddCommand(list)
+	authenticate := (&cobra.Command{
+		Use:     "authenticate",
+		Aliases: []string{"auth"},
+		Run: func(cmd *cobra.Command, args []string) {
+			conn, l := mustDial(ctx, cmd, config)
+			resp, err := auth.NewAuthenticationClient(conn).AuthenticateMQTTClient(ctx, &auth.WaspAuthenticationRequest{
+				MQTT: &auth.ApplicationContext{
+					ClientID: []byte(config.GetString("client-id")),
+					Username: []byte(config.GetString("username")),
+					Password: []byte(config.GetString("password")),
+				},
+				Transport: &auth.TransportContext{
+					Encrypted: config.GetBool("encrypted"),
+				},
+			})
+			if err != nil {
+				l.Fatal("authentication failed", zap.Error(err))
+			}
+			fmt.Printf("authentication succeed: session_id=%s, tenant=%s\n", resp.ID, resp.MountPoint)
+		},
+	})
+	authenticate.Flags().StringP("client-id", "i", "", "MQTT Client-ID")
+	authenticate.Flags().StringP("username", "u", "", "MQTT Username")
+	authenticate.Flags().StringP("password", "p", "", "MQTT Password")
+	authenticate.Flags().BoolP("encrypted", "e", false, "Flag transport as Encrypted")
+
+	cmd.AddCommand(authenticate)
 
 	return cmd
 }

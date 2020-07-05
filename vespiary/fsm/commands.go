@@ -183,8 +183,9 @@ func (f *FSM) EnableDevice(ctx context.Context, id, owner string) error {
 func (f *FSM) ChangeDevicePassword(ctx context.Context, id, owner, password string) error {
 	return f.commit(ctx, &StateTransition{Event: &StateTransition_DevicePasswordChanged{
 		DevicePasswordChanged: &DevicePasswordChanged{
-			ID:    id,
-			Owner: owner,
+			ID:       id,
+			Owner:    owner,
+			Password: password,
 		},
 	}})
 }

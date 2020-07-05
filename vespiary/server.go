@@ -26,6 +26,7 @@ type State interface {
 	ListAccounts() ([]*api.Account, error)
 	AccountByName(name string) (*api.Account, error)
 	AccountByID(id string) (*api.Account, error)
+	AccountByDeviceUsername(deviceUsername string) (*api.Account, error)
 	AccountByPrincipal(principal string) (*api.Account, error)
 }
 
@@ -46,7 +47,11 @@ func (s *server) Serve(grpcServer *grpc.Server) {
 }
 
 func (s *server) CreateDevice(ctx context.Context, input *api.CreateDeviceRequest) (*api.CreateDeviceResponse, error) {
-	_, err := s.state.DeviceByName(input.Owner, input.Name)
+	_, err := s.state.AccountByID(input.Owner)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "account does not exist")
+	}
+	_, err = s.state.DeviceByName(input.Owner, input.Name)
 	if err == nil {
 		return nil, status.Error(codes.AlreadyExists, "device already exists")
 	}
@@ -95,6 +100,10 @@ func (s *server) DisableDevice(ctx context.Context, input *api.DisableDeviceRequ
 }
 
 func (s *server) ListDevices(ctx context.Context, input *api.ListDevicesRequest) (*api.ListDevicesResponse, error) {
+	_, err := s.state.AccountByID(input.Owner)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "account does not exist")
+	}
 	devices, err := s.state.DevicesByOwner(input.Owner)
 	if err != nil {
 		return nil, err
@@ -109,7 +118,11 @@ func (s *server) GetDevice(ctx context.Context, input *api.GetDeviceRequest) (*a
 	return &api.GetDeviceResponse{Device: device}, nil
 }
 func (s *server) ChangeDevicePassword(ctx context.Context, input *api.ChangeDevicePasswordRequest) (*api.ChangeDevicePasswordResponse, error) {
-	err := s.fsm.ChangeDevicePassword(ctx, input.Owner, input.ID, fingerprintString(input.NewPassword))
+	_, err := s.state.AccountByID(input.Owner)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "account does not exist")
+	}
+	err = s.fsm.ChangeDevicePassword(ctx, input.ID, input.Owner, fingerprintString(input.NewPassword))
 	if err != nil {
 		return nil, err
 	}
