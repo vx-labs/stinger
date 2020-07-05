@@ -38,10 +38,24 @@ func (s *WaspAuthenticationServer) Serve(grpcServer *grpc.Server) {
 	auth.RegisterAuthenticationServer(grpcServer, s)
 }
 
+func (s *WaspAuthenticationServer) legacyAuth(ctx context.Context, input *auth.WaspAuthenticationRequest) (*auth.WaspAuthenticationResponse, error) {
+	device, err := s.state.DeviceByName(string(input.MQTT.Username), string(input.MQTT.ClientID))
+	if err != nil {
+		s.fsm.CreateDevice(ctx, string(input.MQTT.Username), string(input.MQTT.ClientID), fingerprintBytes(input.MQTT.Password), false)
+		return nil, status.Error(codes.InvalidArgument, "invalid username or password")
+	}
+	if device.Active && device.Password == fingerprintBytes(input.MQTT.Password) {
+		return &auth.WaspAuthenticationResponse{
+			ID:         device.ID,
+			MountPoint: device.Owner,
+		}, nil
+	}
+	return nil, status.Error(codes.InvalidArgument, "invalid username or password")
+}
 func (s *WaspAuthenticationServer) AuthenticateMQTTClient(ctx context.Context, input *auth.WaspAuthenticationRequest) (*auth.WaspAuthenticationResponse, error) {
 	account, err := s.state.AccountByDeviceUsername(string(input.MQTT.Username))
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid username or password")
+		return s.legacyAuth(ctx, input)
 	}
 	device, err := s.state.DeviceByName(account.ID, string(input.MQTT.ClientID))
 	if err != nil {
@@ -54,5 +68,5 @@ func (s *WaspAuthenticationServer) AuthenticateMQTTClient(ctx context.Context, i
 			MountPoint: device.Owner,
 		}, nil
 	}
-	return nil, status.Error(codes.InvalidArgument, "device is disabled or password wrong")
+	return nil, status.Error(codes.InvalidArgument, "invalid username or password")
 }
