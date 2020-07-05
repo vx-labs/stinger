@@ -59,7 +59,7 @@ func (s *WaspAuthenticationServer) AuthenticateMQTTClient(ctx context.Context, i
 	}
 	device, err := s.state.DeviceByName(account.ID, string(input.MQTT.ClientID))
 	if err != nil {
-		s.fsm.CreateDevice(ctx, string(input.MQTT.Username), string(input.MQTT.ClientID), fingerprintBytes(input.MQTT.Password), false)
+		s.fsm.CreateDevice(ctx, account.ID, string(input.MQTT.ClientID), fingerprintBytes(input.MQTT.Password), false)
 		return nil, status.Error(codes.InvalidArgument, "invalid username or password")
 	}
 	if device.Active && device.Password == fingerprintBytes(input.MQTT.Password) {
