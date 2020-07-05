@@ -171,3 +171,11 @@ func (s *server) GetAccountByPrincipal(ctx context.Context, input *api.GetAccoun
 	return &api.GetAccountByPrincipalResponse{Account: accounts}, nil
 
 }
+func (s *server) GetAccountByDeviceUsername(ctx context.Context, input *api.GetAccountByDeviceUsernameRequest) (*api.GetAccountByDeviceUsernameResponse, error) {
+	accounts, err := s.state.AccountByDeviceUsername(input.Username)
+	if err != nil {
+		return nil, err
+	}
+	return &api.GetAccountByDeviceUsernameResponse{Account: accounts}, nil
+
+}

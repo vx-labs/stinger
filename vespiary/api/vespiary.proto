@@ -83,6 +83,13 @@ message GetAccountByPrincipalResponse {
   Account Account = 1;
 }
 
+message GetAccountByDeviceUsernameRequest {
+  string Username = 1;
+}
+message GetAccountByDeviceUsernameResponse {
+  Account Account = 1;
+}
+
 service Vespiary {
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
   rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse);
@@ -96,6 +103,7 @@ service Vespiary {
   rpc ChangeDevicePassword(ChangeDevicePasswordRequest)
       returns (ChangeDevicePasswordResponse);
   rpc GetAccountByPrincipal(GetAccountByPrincipalRequest) returns (GetAccountByPrincipalResponse);
+  rpc GetAccountByDeviceUsername(GetAccountByDeviceUsernameRequest) returns (GetAccountByDeviceUsernameResponse);
 }
 
 message ShutdownRequest {}
