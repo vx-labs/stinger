@@ -13,6 +13,12 @@ func Test_memDBStore(t *testing.T) {
 	id := "4bffa69d-6a09-4b4c-ade8-197fa75b7d8e"
 	owner := "491c17f0-eb84-4bdf-85ac-411fdbe928ca"
 
+	t.Run("create account", func(t *testing.T) {
+		require.NoError(t, store.CreateAccount(&api.Account{
+			ID:   owner,
+			Name: "my_account",
+		}))
+	})
 	t.Run("create device", func(t *testing.T) {
 		require.NoError(t, store.CreateDevice(&api.Device{
 			ID:     id,

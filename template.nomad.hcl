@@ -7,7 +7,7 @@ job "vespiary" {
     min_healthy_time = "30s"
     healthy_deadline = "3m"
     auto_revert      = true
-    canary           = 0
+    canary           = 1
   }
 
   group "vespiary" {
