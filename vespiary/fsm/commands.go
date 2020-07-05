@@ -28,6 +28,8 @@ type State interface {
 	CreateAccount(account *api.Account) error
 	DeleteAccount(id string) error
 	AccountByID(id string) (*api.Account, error)
+	AddDeviceUsername(account string, username string) error
+	RemoveDeviceUsername(account string, username string) error
 }
 
 func decode(payload []byte) ([]*StateTransition, error) {
@@ -98,6 +100,18 @@ func (f *FSM) record(ctx context.Context, events ...*StateTransition) error {
 			err = f.recorder.RecordEvent(tenant, audit.DevicePasswordChanged, map[string]string{
 				"device_id": input.ID,
 			})
+		case *StateTransition_AccountDeviceUsernameAdded:
+			input := event.AccountDeviceUsernameAdded
+			tenant := input.ID
+			err = f.recorder.RecordEvent(tenant, audit.DevicePasswordChanged, map[string]string{
+				"device_username": input.DeviceUsername,
+			})
+		case *StateTransition_AccountDeviceUsernameRemoved:
+			input := event.AccountDeviceUsernameRemoved
+			tenant := input.ID
+			err = f.recorder.RecordEvent(tenant, audit.DevicePasswordChanged, map[string]string{
+				"device_username": input.DeviceUsername,
+			})
 		case *StateTransition_PeerLost:
 		}
 		if err != nil {
@@ -146,6 +160,28 @@ func (f *FSM) CreateAccount(ctx context.Context, name string, principals, device
 			Principals:      principals,
 			DeviceUsernames: deviceUsernames,
 			CreatedAt:       now,
+		},
+	}})
+}
+func (f *FSM) AddDeviceUsername(ctx context.Context, accountID string, deviceUsername string) error {
+	if _, err := f.state.AccountByID(accountID); err != nil {
+		return ErrAccountDoesNotExist
+	}
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_AccountDeviceUsernameAdded{
+		&AccountDeviceUsernameAdded{
+			ID:             accountID,
+			DeviceUsername: deviceUsername,
+		},
+	}})
+}
+func (f *FSM) RemoveDeviceUsername(ctx context.Context, accountID string, deviceUsername string) error {
+	if _, err := f.state.AccountByID(accountID); err != nil {
+		return ErrAccountDoesNotExist
+	}
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_AccountDeviceUsernameRemoved{
+		&AccountDeviceUsernameRemoved{
+			ID:             accountID,
+			DeviceUsername: deviceUsername,
 		},
 	}})
 }
@@ -255,6 +291,12 @@ func (f *FSM) Apply(index uint64, b []byte) error {
 		case *StateTransition_DevicePasswordChanged:
 			in := event.DevicePasswordChanged
 			err = f.state.ChangeDevicePassword(in.ID, in.Owner, in.Password)
+		case *StateTransition_AccountDeviceUsernameAdded:
+			in := event.AccountDeviceUsernameAdded
+			err = f.state.AddDeviceUsername(in.ID, in.DeviceUsername)
+		case *StateTransition_AccountDeviceUsernameRemoved:
+			in := event.AccountDeviceUsernameRemoved
+			err = f.state.RemoveDeviceUsername(in.ID, in.DeviceUsername)
 		default:
 		}
 		if err != nil {

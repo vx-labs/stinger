@@ -238,6 +238,50 @@ func (s *memDBStore) AccountByDeviceUsername(deviceUsername string) (*api.Accoun
 	}
 	return elt.(*api.Account), nil
 }
+func (s *memDBStore) AddDeviceUsername(accountID string, username string) error {
+	tx := s.db.Txn(true)
+	defer tx.Abort()
+	account, err := s.accountByID(tx, accountID)
+	if err != nil {
+		return ErrAccountDoesNotExist
+	}
+	for idx := range account.DeviceUsernames {
+		if username == account.DeviceUsernames[idx] {
+			return nil
+		}
+	}
+	account.DeviceUsernames = append(account.DeviceUsernames, username)
+	err = tx.Insert(accountsTable, account)
+	if err != nil {
+		return err
+	}
+	tx.Commit()
+	return nil
+}
+func (s *memDBStore) RemoveDeviceUsername(accountID string, username string) error {
+	tx := s.db.Txn(true)
+	defer tx.Abort()
+	account, err := s.accountByID(tx, accountID)
+	if err != nil {
+		return ErrAccountDoesNotExist
+	}
+	newList := make([]string, 0)
+	for idx := range account.DeviceUsernames {
+		if username != account.DeviceUsernames[idx] {
+			newList = append(newList, account.DeviceUsernames[idx])
+		}
+	}
+	if len(newList) == len(account.DeviceUsernames) {
+		return nil
+	}
+	account.DeviceUsernames = newList
+	err = tx.Insert(accountsTable, account)
+	if err != nil {
+		return err
+	}
+	tx.Commit()
+	return nil
+}
 func (s *memDBStore) DeviceByID(owner, id string) (*api.Device, error) {
 	tx := s.db.Txn(false)
 	defer tx.Abort()

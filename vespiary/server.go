@@ -17,6 +17,8 @@ type FSM interface {
 	ChangeDevicePassword(ctx context.Context, id, owner, password string) error
 	CreateAccount(ctx context.Context, name string, principals, deviceUsernames []string) (string, error)
 	DeleteAccount(ctx context.Context, id string) error
+	AddDeviceUsername(ctx context.Context, accountID string, deviceUsername string) error
+	RemoveDeviceUsername(ctx context.Context, accountID string, deviceUsername string) error
 }
 
 type State interface {
@@ -177,5 +179,30 @@ func (s *server) GetAccountByDeviceUsername(ctx context.Context, input *api.GetA
 		return nil, err
 	}
 	return &api.GetAccountByDeviceUsernameResponse{Account: accounts}, nil
+
+}
+
+func (s *server) AddAccountDeviceUsername(ctx context.Context, input *api.AddAccountDeviceUsernameRequest) (*api.AddAccountDeviceUsernameResponse, error) {
+	_, err := s.state.AccountByID(input.ID)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "account does not exist")
+	}
+	err = s.fsm.AddDeviceUsername(ctx, input.ID, input.Username)
+	if err != nil {
+		return nil, err
+	}
+	return &api.AddAccountDeviceUsernameResponse{}, nil
+
+}
+func (s *server) RemoveAccountDeviceUsername(ctx context.Context, input *api.RemoveAccountDeviceUsernameRequest) (*api.RemoveAccountDeviceUsernameResponse, error) {
+	_, err := s.state.AccountByID(input.ID)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "account does not exist")
+	}
+	err = s.fsm.RemoveDeviceUsername(ctx, input.ID, input.Username)
+	if err != nil {
+		return nil, err
+	}
+	return &api.RemoveAccountDeviceUsernameResponse{}, nil
 
 }

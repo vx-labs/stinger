@@ -104,6 +104,31 @@ func Accounts(ctx context.Context, config *viper.Viper) *cobra.Command {
 
 		},
 	})
+	addUsername := &cobra.Command{
+		Use: "add-username",
+		Run: func(cmd *cobra.Command, args []string) {
+			conn, l := mustDial(ctx, cmd, config)
+			_, err := api.NewVespiaryClient(conn).AddAccountDeviceUsername(ctx, &api.AddAccountDeviceUsernameRequest{ID: config.GetString("id"), Username: args[0]})
+			if err != nil {
+				l.Fatal("failed to list accounts", zap.Error(err))
+			}
+		},
+	}
+	addUsername.Flags().StringP("id", "i", "", "Account ID")
+	cmd.AddCommand(addUsername)
+
+	removeUsername := &cobra.Command{
+		Use: "remove-username",
+		Run: func(cmd *cobra.Command, args []string) {
+			conn, l := mustDial(ctx, cmd, config)
+			_, err := api.NewVespiaryClient(conn).RemoveAccountDeviceUsername(ctx, &api.RemoveAccountDeviceUsernameRequest{ID: config.GetString("id"), Username: args[0]})
+			if err != nil {
+				l.Fatal("failed to list accounts", zap.Error(err))
+			}
+		},
+	}
+	removeUsername.Flags().StringP("id", "i", "", "Account ID")
+	cmd.AddCommand(removeUsername)
 
 	delete := (&cobra.Command{
 		Use: "delete",

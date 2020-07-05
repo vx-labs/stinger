@@ -13,6 +13,8 @@ message AccountCreated {
   int64 CreatedAt = 5;
 }
 message AccountDeleted { string ID = 1; }
+message AccountDeviceUsernameAdded { string ID = 1; string DeviceUsername = 2; }
+message AccountDeviceUsernameRemoved { string ID = 1; string DeviceUsername = 2; }
 
 message DeviceCreated {
   string ID = 1;
@@ -50,5 +52,7 @@ message StateTransition {
     DevicePasswordChanged DevicePasswordChanged = 6;
     AccountCreated AccountCreated = 7;
     AccountDeleted AccountDeleted = 8;
+    AccountDeviceUsernameAdded AccountDeviceUsernameAdded = 9;
+    AccountDeviceUsernameRemoved AccountDeviceUsernameRemoved = 10;
   }
 }

@@ -76,19 +76,21 @@ message DeleteAccountResponse {}
 
 message ListAccountsRequest {};
 message ListAccountsResponse { repeated Account Accounts = 1; };
-message GetAccountByPrincipalRequest {
-  string Principal = 1;
-}
-message GetAccountByPrincipalResponse {
-  Account Account = 1;
-}
+message GetAccountByPrincipalRequest { string Principal = 1; }
+message GetAccountByPrincipalResponse { Account Account = 1; }
 
-message GetAccountByDeviceUsernameRequest {
-  string Username = 1;
+message GetAccountByDeviceUsernameRequest { string Username = 1; }
+message GetAccountByDeviceUsernameResponse { Account Account = 1; }
+message AddAccountDeviceUsernameRequest {
+  string ID = 1;
+  string Username = 2;
 }
-message GetAccountByDeviceUsernameResponse {
-  Account Account = 1;
+message AddAccountDeviceUsernameResponse {}
+message RemoveAccountDeviceUsernameRequest {
+  string ID = 1;
+  string Username = 2;
 }
+message RemoveAccountDeviceUsernameResponse {}
 
 service Vespiary {
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
@@ -102,8 +104,14 @@ service Vespiary {
   rpc DisableDevice(DisableDeviceRequest) returns (DisableDeviceResponse);
   rpc ChangeDevicePassword(ChangeDevicePasswordRequest)
       returns (ChangeDevicePasswordResponse);
-  rpc GetAccountByPrincipal(GetAccountByPrincipalRequest) returns (GetAccountByPrincipalResponse);
-  rpc GetAccountByDeviceUsername(GetAccountByDeviceUsernameRequest) returns (GetAccountByDeviceUsernameResponse);
+  rpc GetAccountByPrincipal(GetAccountByPrincipalRequest)
+      returns (GetAccountByPrincipalResponse);
+  rpc GetAccountByDeviceUsername(GetAccountByDeviceUsernameRequest)
+      returns (GetAccountByDeviceUsernameResponse);
+  rpc AddAccountDeviceUsername(AddAccountDeviceUsernameRequest)
+      returns (AddAccountDeviceUsernameResponse);
+  rpc RemoveAccountDeviceUsername(RemoveAccountDeviceUsernameRequest)
+      returns (RemoveAccountDeviceUsernameResponse);
 }
 
 message ShutdownRequest {}
