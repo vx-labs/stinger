@@ -21,6 +21,8 @@ import (
 	"github.com/vx-labs/wasp/async"
 	"github.com/vx-labs/wasp/cluster"
 	"github.com/vx-labs/wasp/cluster/raft"
+	"go.etcd.io/etcd/etcdserver/api/snap"
+
 	"github.com/vx-labs/wasp/rpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/health"
@@ -124,6 +126,10 @@ func main() {
 				vespiary.L(ctx).Info("started pprof", zap.String("pprof_url", fmt.Sprintf("http://%s/", address)))
 			}
 			healthServer := health.NewServer()
+			healthServer.SetServingStatus("mqtt", healthpb.HealthCheckResponse_SERVING)
+			healthServer.SetServingStatus("node", healthpb.HealthCheckResponse_SERVING)
+			healthServer.SetServingStatus("rpc", healthpb.HealthCheckResponse_NOT_SERVING)
+
 			stateStore := vespiary.NewStateStore()
 			healthServer.Resume()
 			operations := async.NewOperations(ctx, vespiary.L(ctx))
@@ -162,6 +168,12 @@ func main() {
 					zap.Duration("consul_discovery_duration", time.Since(discoveryStarted)), zap.Int("node_count", len(consulJoinList)))
 				joinList = append(joinList, consulJoinList...)
 			}
+			auditRecorder, err := getAuditRecorder(ctx, rpcDialer, config, vespiary.L(ctx))
+			if err != nil {
+				vespiary.L(ctx).Fatal("failed to create audit recorder", zap.Error(err))
+			}
+
+			stateMachine := fsm.NewFSM(id, stateStore, commandsCh, auditRecorder)
 
 			clusterNode := cluster.NewNode(cluster.NodeConfig{
 				ID:            id,
@@ -176,7 +188,18 @@ func main() {
 					},
 				},
 				RaftConfig: cluster.RaftConfig{
-					GetStateSnapshot:  stateStore.Dump,
+					GetStateSnapshot: stateStore.Dump,
+					CommitApplier: func(ctx context.Context, event raft.Commit) error {
+						return stateMachine.Apply(event.Index, event.Payload)
+					},
+					SnapshotApplier: func(ctx context.Context, index uint64, snapshotter *snap.Snapshotter) error {
+						snapshot, err := snapshotter.Load()
+						if err != nil {
+							vespiary.L(ctx).Error("failed to load snapshot", zap.Error(err))
+							return err
+						}
+						return stateStore.Load(snapshot.Data)
+					},
 					ExpectedNodeCount: config.GetInt("raft-bootstrap-expect"),
 					Network: cluster.NetworkConfig{
 						AdvertizedHost: config.GetString("raft-advertized-address"),
@@ -189,12 +212,7 @@ func main() {
 			operations.Run("cluster node", func(ctx context.Context) {
 				clusterNode.Run(ctx)
 			})
-			auditRecorder, err := getAuditRecorder(ctx, rpcDialer, config, vespiary.L(ctx))
-			if err != nil {
-				vespiary.L(ctx).Fatal("failed to create audit recorder", zap.Error(err))
-			}
 
-			stateMachine := fsm.NewFSM(id, stateStore, commandsCh, auditRecorder)
 			vespiaryServer := vespiary.NewServer(stateMachine, stateStore)
 			vespiaryServer.Serve(server)
 			waspAuthServer := vespiary.NewWaspAuthenticationServer(stateMachine, stateStore)
@@ -205,15 +223,6 @@ func main() {
 					panic(err)
 				}
 			})
-
-			snapshotter := <-clusterNode.Snapshotter()
-			snapshot, err := snapshotter.Load()
-			if err == nil {
-				err = stateStore.Load(snapshot.Data)
-				if err != nil {
-					vespiary.L(ctx).Fatal("failed to load snapshot in store", zap.Error(err))
-				}
-			}
 
 			operations.Run("command publisher", func(ctx context.Context) {
 				for {
@@ -231,33 +240,9 @@ func main() {
 					}
 				}
 			})
-			operations.Run("command processor", func(ctx context.Context) {
-				for {
-					select {
-					case <-ctx.Done():
-						return
-					case event := <-clusterNode.Commits():
-						if event.Payload == nil {
-							snapshot, err := snapshotter.Load()
-							if err != nil {
-								vespiary.L(ctx).Error("failed to load snapshot", zap.Error(err))
-								break
-							}
-							err = stateStore.Load(snapshot.Data)
-							if err != nil {
-								vespiary.L(ctx).Error("failed to load snapshot in store", zap.Error(err))
-							}
-						} else {
-							stateMachine.Apply(event.Index, event.Payload)
-						}
-					}
-				}
-			})
 			<-clusterNode.Ready()
-
-			healthServer.SetServingStatus("mqtt", healthpb.HealthCheckResponse_SERVING)
-			healthServer.SetServingStatus("node", healthpb.HealthCheckResponse_SERVING)
 			healthServer.SetServingStatus("rpc", healthpb.HealthCheckResponse_SERVING)
+
 			sigc := make(chan os.Signal, 1)
 			signal.Notify(sigc,
 				syscall.SIGINT,
