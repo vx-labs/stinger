@@ -19,7 +19,8 @@ require (
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.5.1
-	github.com/vx-labs/wasp v1.8.29
+	github.com/vx-labs/wasp v1.8.31
+	go.etcd.io/etcd v0.0.0-20200716221620-18dfb9cca345
 	go.uber.org/zap v1.14.1
 	google.golang.org/grpc v1.28.0
 )
