@@ -106,18 +106,21 @@ func Devices(ctx context.Context, config *viper.Viper) *cobra.Command {
 	delete := (&cobra.Command{
 		Use:     "delete",
 		Aliases: []string{"rm"},
+		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			conn, l := mustDial(ctx, cmd, config)
-			_, err := api.NewVespiaryClient(conn).DeleteDevice(ctx, &api.DeleteDeviceRequest{
-				ID:    config.GetString("id"),
-				Owner: config.GetString("owner"),
-			})
-			if err != nil {
-				l.Fatal("failed to disable device", zap.Error(err))
+			for _, id := range args {
+				_, err := api.NewVespiaryClient(conn).DeleteDevice(ctx, &api.DeleteDeviceRequest{
+					ID:    id,
+					Owner: config.GetString("owner"),
+				})
+				if err != nil {
+					l.Fatal("failed to delete device", zap.Error(err))
+				}
+				fmt.Println(id)
 			}
 		},
 	})
-	delete.Flags().StringP("id", "i", "", "Device ID")
 	delete.Flags().StringP("owner", "o", "", "Device Owner")
 	cmd.AddCommand(delete)
 	changePassword := (&cobra.Command{
