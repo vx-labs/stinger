@@ -10,9 +10,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
+	"github.com/vx-labs/cluster/raft"
 	"github.com/vx-labs/vespiary/vespiary/api"
 	"github.com/vx-labs/vespiary/vespiary/audit"
-	"github.com/vx-labs/wasp/cluster/raft"
 )
 
 var (

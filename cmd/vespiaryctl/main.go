@@ -12,7 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	cluster "github.com/vx-labs/wasp/cluster/clusterpb"
+	cluster "github.com/vx-labs/cluster/clusterpb"
 	"go.uber.org/zap"
 )
 
@@ -52,7 +52,7 @@ func main() {
 		Use: "members",
 		Run: func(cmd *cobra.Command, _ []string) {
 			conn, l := mustDial(ctx, cmd, config)
-			out, err := cluster.NewRaftClient(conn).GetMembers(ctx, &cluster.GetMembersRequest{})
+			out, err := cluster.NewMultiRaftClient(conn).GetMembers(ctx, &cluster.GetMembersRequest{})
 			if err != nil {
 				l.Fatal("failed to list raft members", zap.Error(err))
 			}

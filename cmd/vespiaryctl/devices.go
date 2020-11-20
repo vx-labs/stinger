@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/vx-labs/vespiary/vespiary/api"
-	"github.com/vx-labs/wasp/wasp/auth"
+	"github.com/vx-labs/wasp/v4/wasp/auth"
 	"go.uber.org/zap"
 )
 

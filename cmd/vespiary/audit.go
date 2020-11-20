@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/vx-labs/vespiary/vespiary/audit"
-	"github.com/vx-labs/wasp/rpc"
+	"github.com/vx-labs/wasp/v4/rpc"
 	"go.uber.org/zap"
 )
 

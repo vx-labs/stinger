@@ -16,14 +16,14 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/vx-labs/cluster"
+	"github.com/vx-labs/cluster/raft"
 	"github.com/vx-labs/vespiary/vespiary"
 	"github.com/vx-labs/vespiary/vespiary/fsm"
-	"github.com/vx-labs/wasp/async"
-	"github.com/vx-labs/wasp/cluster"
-	"github.com/vx-labs/wasp/cluster/raft"
+	"github.com/vx-labs/wasp/v4/async"
 	"go.etcd.io/etcd/etcdserver/api/snap"
 
-	"github.com/vx-labs/wasp/rpc"
+	"github.com/vx-labs/wasp/v4/rpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -174,8 +174,27 @@ func main() {
 			}
 
 			stateMachine := fsm.NewFSM(id, stateStore, commandsCh, auditRecorder)
-
-			clusterNode := cluster.NewNode(cluster.NodeConfig{
+			raftConfig := cluster.RaftConfig{
+				GetStateSnapshot: stateStore.Dump,
+				CommitApplier: func(ctx context.Context, event raft.Commit) error {
+					return stateMachine.Apply(event.Index, event.Payload)
+				},
+				SnapshotApplier: func(ctx context.Context, index uint64, snapshotter *snap.Snapshotter) error {
+					snapshot, err := snapshotter.Load()
+					if err != nil {
+						vespiary.L(ctx).Error("failed to load snapshot", zap.Error(err))
+						return err
+					}
+					return stateStore.Load(snapshot.Data)
+				},
+				ExpectedNodeCount: config.GetInt("raft-bootstrap-expect"),
+				Network: cluster.NetworkConfig{
+					AdvertizedHost: config.GetString("raft-advertized-address"),
+					AdvertizedPort: config.GetInt("raft-advertized-port"),
+					ListeningPort:  config.GetInt("raft-port"),
+				},
+			}
+			clusterMultiNode := cluster.NewMultiNode(cluster.NodeConfig{
 				ID:            id,
 				ServiceName:   "vespiary",
 				DataDirectory: config.GetString("data-dir"),
@@ -187,28 +206,9 @@ func main() {
 						ListeningPort:  config.GetInt("serf-port"),
 					},
 				},
-				RaftConfig: cluster.RaftConfig{
-					GetStateSnapshot: stateStore.Dump,
-					CommitApplier: func(ctx context.Context, event raft.Commit) error {
-						return stateMachine.Apply(event.Index, event.Payload)
-					},
-					SnapshotApplier: func(ctx context.Context, index uint64, snapshotter *snap.Snapshotter) error {
-						snapshot, err := snapshotter.Load()
-						if err != nil {
-							vespiary.L(ctx).Error("failed to load snapshot", zap.Error(err))
-							return err
-						}
-						return stateStore.Load(snapshot.Data)
-					},
-					ExpectedNodeCount: config.GetInt("raft-bootstrap-expect"),
-					Network: cluster.NetworkConfig{
-						AdvertizedHost: config.GetString("raft-advertized-address"),
-						AdvertizedPort: config.GetInt("raft-advertized-port"),
-						ListeningPort:  config.GetInt("raft-port"),
-					},
-				},
+				RaftConfig: raftConfig,
 			}, rpcDialer, server, vespiary.L(ctx))
-
+			clusterNode := clusterMultiNode.Node("vespiary", raftConfig)
 			operations.Run("cluster node", func(ctx context.Context) {
 				clusterNode.Run(ctx)
 			})
@@ -265,6 +265,7 @@ func main() {
 			} else {
 				vespiary.L(ctx).Debug("cluster left")
 			}
+			clusterMultiNode.Shutdown()
 			healthServer.Shutdown()
 			vespiary.L(ctx).Debug("health server stopped")
 			go func() {
