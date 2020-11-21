@@ -252,6 +252,226 @@ func (m *Device) GetPassword() string {
 	return ""
 }
 
+type Application struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	AccountID            string   `protobuf:"bytes,2,opt,name=AccountID,proto3" json:"AccountID,omitempty"`
+	Name                 string   `protobuf:"bytes,3,opt,name=Name,proto3" json:"Name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Application) Reset()         { *m = Application{} }
+func (m *Application) String() string { return proto.CompactTextString(m) }
+func (*Application) ProtoMessage()    {}
+func (*Application) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{4}
+}
+
+func (m *Application) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Application.Unmarshal(m, b)
+}
+func (m *Application) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Application.Marshal(b, m, deterministic)
+}
+func (m *Application) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Application.Merge(m, src)
+}
+func (m *Application) XXX_Size() int {
+	return xxx_messageInfo_Application.Size(m)
+}
+func (m *Application) XXX_DiscardUnknown() {
+	xxx_messageInfo_Application.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Application proto.InternalMessageInfo
+
+func (m *Application) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *Application) GetAccountID() string {
+	if m != nil {
+		return m.AccountID
+	}
+	return ""
+}
+
+func (m *Application) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type ApplicationSet struct {
+	Applications         []*Application `protobuf:"bytes,1,rep,name=Applications,proto3" json:"Applications,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *ApplicationSet) Reset()         { *m = ApplicationSet{} }
+func (m *ApplicationSet) String() string { return proto.CompactTextString(m) }
+func (*ApplicationSet) ProtoMessage()    {}
+func (*ApplicationSet) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{5}
+}
+
+func (m *ApplicationSet) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ApplicationSet.Unmarshal(m, b)
+}
+func (m *ApplicationSet) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ApplicationSet.Marshal(b, m, deterministic)
+}
+func (m *ApplicationSet) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationSet.Merge(m, src)
+}
+func (m *ApplicationSet) XXX_Size() int {
+	return xxx_messageInfo_ApplicationSet.Size(m)
+}
+func (m *ApplicationSet) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationSet.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationSet proto.InternalMessageInfo
+
+func (m *ApplicationSet) GetApplications() []*Application {
+	if m != nil {
+		return m.Applications
+	}
+	return nil
+}
+
+type ApplicationProfile struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	AccountID            string   `protobuf:"bytes,2,opt,name=AccountID,proto3" json:"AccountID,omitempty"`
+	ApplicationID        string   `protobuf:"bytes,3,opt,name=ApplicationID,proto3" json:"ApplicationID,omitempty"`
+	Name                 string   `protobuf:"bytes,4,opt,name=Name,proto3" json:"Name,omitempty"`
+	Enabled              bool     `protobuf:"varint,5,opt,name=Enabled,proto3" json:"Enabled,omitempty"`
+	PasswordFingerprint  []byte   `protobuf:"bytes,6,opt,name=PasswordFingerprint,proto3" json:"PasswordFingerprint,omitempty"`
+	PasswordSalt         []byte   `protobuf:"bytes,7,opt,name=PasswordSalt,proto3" json:"PasswordSalt,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ApplicationProfile) Reset()         { *m = ApplicationProfile{} }
+func (m *ApplicationProfile) String() string { return proto.CompactTextString(m) }
+func (*ApplicationProfile) ProtoMessage()    {}
+func (*ApplicationProfile) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{6}
+}
+
+func (m *ApplicationProfile) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ApplicationProfile.Unmarshal(m, b)
+}
+func (m *ApplicationProfile) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ApplicationProfile.Marshal(b, m, deterministic)
+}
+func (m *ApplicationProfile) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationProfile.Merge(m, src)
+}
+func (m *ApplicationProfile) XXX_Size() int {
+	return xxx_messageInfo_ApplicationProfile.Size(m)
+}
+func (m *ApplicationProfile) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationProfile.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationProfile proto.InternalMessageInfo
+
+func (m *ApplicationProfile) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *ApplicationProfile) GetAccountID() string {
+	if m != nil {
+		return m.AccountID
+	}
+	return ""
+}
+
+func (m *ApplicationProfile) GetApplicationID() string {
+	if m != nil {
+		return m.ApplicationID
+	}
+	return ""
+}
+
+func (m *ApplicationProfile) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *ApplicationProfile) GetEnabled() bool {
+	if m != nil {
+		return m.Enabled
+	}
+	return false
+}
+
+func (m *ApplicationProfile) GetPasswordFingerprint() []byte {
+	if m != nil {
+		return m.PasswordFingerprint
+	}
+	return nil
+}
+
+func (m *ApplicationProfile) GetPasswordSalt() []byte {
+	if m != nil {
+		return m.PasswordSalt
+	}
+	return nil
+}
+
+type ApplicationProfileSet struct {
+	ApplicationProfiles  []*ApplicationProfile `protobuf:"bytes,1,rep,name=ApplicationProfiles,proto3" json:"ApplicationProfiles,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
+	XXX_unrecognized     []byte                `json:"-"`
+	XXX_sizecache        int32                 `json:"-"`
+}
+
+func (m *ApplicationProfileSet) Reset()         { *m = ApplicationProfileSet{} }
+func (m *ApplicationProfileSet) String() string { return proto.CompactTextString(m) }
+func (*ApplicationProfileSet) ProtoMessage()    {}
+func (*ApplicationProfileSet) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{7}
+}
+
+func (m *ApplicationProfileSet) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ApplicationProfileSet.Unmarshal(m, b)
+}
+func (m *ApplicationProfileSet) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ApplicationProfileSet.Marshal(b, m, deterministic)
+}
+func (m *ApplicationProfileSet) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplicationProfileSet.Merge(m, src)
+}
+func (m *ApplicationProfileSet) XXX_Size() int {
+	return xxx_messageInfo_ApplicationProfileSet.Size(m)
+}
+func (m *ApplicationProfileSet) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplicationProfileSet.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplicationProfileSet proto.InternalMessageInfo
+
+func (m *ApplicationProfileSet) GetApplicationProfiles() []*ApplicationProfile {
+	if m != nil {
+		return m.ApplicationProfiles
+	}
+	return nil
+}
+
 type CreateDeviceRequest struct {
 	Owner                string   `protobuf:"bytes,1,opt,name=Owner,proto3" json:"Owner,omitempty"`
 	Name                 string   `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`
@@ -266,7 +486,7 @@ func (m *CreateDeviceRequest) Reset()         { *m = CreateDeviceRequest{} }
 func (m *CreateDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateDeviceRequest) ProtoMessage()    {}
 func (*CreateDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{4}
+	return fileDescriptor_efc1ff1bbf92a481, []int{8}
 }
 
 func (m *CreateDeviceRequest) XXX_Unmarshal(b []byte) error {
@@ -326,7 +546,7 @@ func (m *CreateDeviceResponse) Reset()         { *m = CreateDeviceResponse{} }
 func (m *CreateDeviceResponse) String() string { return proto.CompactTextString(m) }
 func (*CreateDeviceResponse) ProtoMessage()    {}
 func (*CreateDeviceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{5}
+	return fileDescriptor_efc1ff1bbf92a481, []int{9}
 }
 
 func (m *CreateDeviceResponse) XXX_Unmarshal(b []byte) error {
@@ -366,7 +586,7 @@ func (m *DeleteDeviceRequest) Reset()         { *m = DeleteDeviceRequest{} }
 func (m *DeleteDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteDeviceRequest) ProtoMessage()    {}
 func (*DeleteDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{6}
+	return fileDescriptor_efc1ff1bbf92a481, []int{10}
 }
 
 func (m *DeleteDeviceRequest) XXX_Unmarshal(b []byte) error {
@@ -412,7 +632,7 @@ func (m *DeleteDeviceResponse) Reset()         { *m = DeleteDeviceResponse{} }
 func (m *DeleteDeviceResponse) String() string { return proto.CompactTextString(m) }
 func (*DeleteDeviceResponse) ProtoMessage()    {}
 func (*DeleteDeviceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{7}
+	return fileDescriptor_efc1ff1bbf92a481, []int{11}
 }
 
 func (m *DeleteDeviceResponse) XXX_Unmarshal(b []byte) error {
@@ -451,7 +671,7 @@ func (m *ListDevicesRequest) Reset()         { *m = ListDevicesRequest{} }
 func (m *ListDevicesRequest) String() string { return proto.CompactTextString(m) }
 func (*ListDevicesRequest) ProtoMessage()    {}
 func (*ListDevicesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{8}
+	return fileDescriptor_efc1ff1bbf92a481, []int{12}
 }
 
 func (m *ListDevicesRequest) XXX_Unmarshal(b []byte) error {
@@ -490,7 +710,7 @@ func (m *ListDevicesResponse) Reset()         { *m = ListDevicesResponse{} }
 func (m *ListDevicesResponse) String() string { return proto.CompactTextString(m) }
 func (*ListDevicesResponse) ProtoMessage()    {}
 func (*ListDevicesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{9}
+	return fileDescriptor_efc1ff1bbf92a481, []int{13}
 }
 
 func (m *ListDevicesResponse) XXX_Unmarshal(b []byte) error {
@@ -530,7 +750,7 @@ func (m *GetDeviceRequest) Reset()         { *m = GetDeviceRequest{} }
 func (m *GetDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*GetDeviceRequest) ProtoMessage()    {}
 func (*GetDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{10}
+	return fileDescriptor_efc1ff1bbf92a481, []int{14}
 }
 
 func (m *GetDeviceRequest) XXX_Unmarshal(b []byte) error {
@@ -576,7 +796,7 @@ func (m *GetDeviceResponse) Reset()         { *m = GetDeviceResponse{} }
 func (m *GetDeviceResponse) String() string { return proto.CompactTextString(m) }
 func (*GetDeviceResponse) ProtoMessage()    {}
 func (*GetDeviceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{11}
+	return fileDescriptor_efc1ff1bbf92a481, []int{15}
 }
 
 func (m *GetDeviceResponse) XXX_Unmarshal(b []byte) error {
@@ -616,7 +836,7 @@ func (m *EnableDeviceRequest) Reset()         { *m = EnableDeviceRequest{} }
 func (m *EnableDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*EnableDeviceRequest) ProtoMessage()    {}
 func (*EnableDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{12}
+	return fileDescriptor_efc1ff1bbf92a481, []int{16}
 }
 
 func (m *EnableDeviceRequest) XXX_Unmarshal(b []byte) error {
@@ -661,7 +881,7 @@ func (m *EnableDeviceResponse) Reset()         { *m = EnableDeviceResponse{} }
 func (m *EnableDeviceResponse) String() string { return proto.CompactTextString(m) }
 func (*EnableDeviceResponse) ProtoMessage()    {}
 func (*EnableDeviceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{13}
+	return fileDescriptor_efc1ff1bbf92a481, []int{17}
 }
 
 func (m *EnableDeviceResponse) XXX_Unmarshal(b []byte) error {
@@ -694,7 +914,7 @@ func (m *DisableDeviceRequest) Reset()         { *m = DisableDeviceRequest{} }
 func (m *DisableDeviceRequest) String() string { return proto.CompactTextString(m) }
 func (*DisableDeviceRequest) ProtoMessage()    {}
 func (*DisableDeviceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{14}
+	return fileDescriptor_efc1ff1bbf92a481, []int{18}
 }
 
 func (m *DisableDeviceRequest) XXX_Unmarshal(b []byte) error {
@@ -739,7 +959,7 @@ func (m *DisableDeviceResponse) Reset()         { *m = DisableDeviceResponse{} }
 func (m *DisableDeviceResponse) String() string { return proto.CompactTextString(m) }
 func (*DisableDeviceResponse) ProtoMessage()    {}
 func (*DisableDeviceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{15}
+	return fileDescriptor_efc1ff1bbf92a481, []int{19}
 }
 
 func (m *DisableDeviceResponse) XXX_Unmarshal(b []byte) error {
@@ -773,7 +993,7 @@ func (m *ChangeDevicePasswordRequest) Reset()         { *m = ChangeDevicePasswor
 func (m *ChangeDevicePasswordRequest) String() string { return proto.CompactTextString(m) }
 func (*ChangeDevicePasswordRequest) ProtoMessage()    {}
 func (*ChangeDevicePasswordRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{16}
+	return fileDescriptor_efc1ff1bbf92a481, []int{20}
 }
 
 func (m *ChangeDevicePasswordRequest) XXX_Unmarshal(b []byte) error {
@@ -825,7 +1045,7 @@ func (m *ChangeDevicePasswordResponse) Reset()         { *m = ChangeDevicePasswo
 func (m *ChangeDevicePasswordResponse) String() string { return proto.CompactTextString(m) }
 func (*ChangeDevicePasswordResponse) ProtoMessage()    {}
 func (*ChangeDevicePasswordResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{17}
+	return fileDescriptor_efc1ff1bbf92a481, []int{21}
 }
 
 func (m *ChangeDevicePasswordResponse) XXX_Unmarshal(b []byte) error {
@@ -859,7 +1079,7 @@ func (m *CreateAccountRequest) Reset()         { *m = CreateAccountRequest{} }
 func (m *CreateAccountRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateAccountRequest) ProtoMessage()    {}
 func (*CreateAccountRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{18}
+	return fileDescriptor_efc1ff1bbf92a481, []int{22}
 }
 
 func (m *CreateAccountRequest) XXX_Unmarshal(b []byte) error {
@@ -912,7 +1132,7 @@ func (m *CreateAccountResponse) Reset()         { *m = CreateAccountResponse{} }
 func (m *CreateAccountResponse) String() string { return proto.CompactTextString(m) }
 func (*CreateAccountResponse) ProtoMessage()    {}
 func (*CreateAccountResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{19}
+	return fileDescriptor_efc1ff1bbf92a481, []int{23}
 }
 
 func (m *CreateAccountResponse) XXX_Unmarshal(b []byte) error {
@@ -951,7 +1171,7 @@ func (m *DeleteAccountRequest) Reset()         { *m = DeleteAccountRequest{} }
 func (m *DeleteAccountRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteAccountRequest) ProtoMessage()    {}
 func (*DeleteAccountRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{20}
+	return fileDescriptor_efc1ff1bbf92a481, []int{24}
 }
 
 func (m *DeleteAccountRequest) XXX_Unmarshal(b []byte) error {
@@ -989,7 +1209,7 @@ func (m *DeleteAccountResponse) Reset()         { *m = DeleteAccountResponse{} }
 func (m *DeleteAccountResponse) String() string { return proto.CompactTextString(m) }
 func (*DeleteAccountResponse) ProtoMessage()    {}
 func (*DeleteAccountResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{21}
+	return fileDescriptor_efc1ff1bbf92a481, []int{25}
 }
 
 func (m *DeleteAccountResponse) XXX_Unmarshal(b []byte) error {
@@ -1020,7 +1240,7 @@ func (m *ListAccountsRequest) Reset()         { *m = ListAccountsRequest{} }
 func (m *ListAccountsRequest) String() string { return proto.CompactTextString(m) }
 func (*ListAccountsRequest) ProtoMessage()    {}
 func (*ListAccountsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{22}
+	return fileDescriptor_efc1ff1bbf92a481, []int{26}
 }
 
 func (m *ListAccountsRequest) XXX_Unmarshal(b []byte) error {
@@ -1052,7 +1272,7 @@ func (m *ListAccountsResponse) Reset()         { *m = ListAccountsResponse{} }
 func (m *ListAccountsResponse) String() string { return proto.CompactTextString(m) }
 func (*ListAccountsResponse) ProtoMessage()    {}
 func (*ListAccountsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{23}
+	return fileDescriptor_efc1ff1bbf92a481, []int{27}
 }
 
 func (m *ListAccountsResponse) XXX_Unmarshal(b []byte) error {
@@ -1091,7 +1311,7 @@ func (m *GetAccountByPrincipalRequest) Reset()         { *m = GetAccountByPrinci
 func (m *GetAccountByPrincipalRequest) String() string { return proto.CompactTextString(m) }
 func (*GetAccountByPrincipalRequest) ProtoMessage()    {}
 func (*GetAccountByPrincipalRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{24}
+	return fileDescriptor_efc1ff1bbf92a481, []int{28}
 }
 
 func (m *GetAccountByPrincipalRequest) XXX_Unmarshal(b []byte) error {
@@ -1130,7 +1350,7 @@ func (m *GetAccountByPrincipalResponse) Reset()         { *m = GetAccountByPrinc
 func (m *GetAccountByPrincipalResponse) String() string { return proto.CompactTextString(m) }
 func (*GetAccountByPrincipalResponse) ProtoMessage()    {}
 func (*GetAccountByPrincipalResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{25}
+	return fileDescriptor_efc1ff1bbf92a481, []int{29}
 }
 
 func (m *GetAccountByPrincipalResponse) XXX_Unmarshal(b []byte) error {
@@ -1169,7 +1389,7 @@ func (m *GetAccountByDeviceUsernameRequest) Reset()         { *m = GetAccountByD
 func (m *GetAccountByDeviceUsernameRequest) String() string { return proto.CompactTextString(m) }
 func (*GetAccountByDeviceUsernameRequest) ProtoMessage()    {}
 func (*GetAccountByDeviceUsernameRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{26}
+	return fileDescriptor_efc1ff1bbf92a481, []int{30}
 }
 
 func (m *GetAccountByDeviceUsernameRequest) XXX_Unmarshal(b []byte) error {
@@ -1208,7 +1428,7 @@ func (m *GetAccountByDeviceUsernameResponse) Reset()         { *m = GetAccountBy
 func (m *GetAccountByDeviceUsernameResponse) String() string { return proto.CompactTextString(m) }
 func (*GetAccountByDeviceUsernameResponse) ProtoMessage()    {}
 func (*GetAccountByDeviceUsernameResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{27}
+	return fileDescriptor_efc1ff1bbf92a481, []int{31}
 }
 
 func (m *GetAccountByDeviceUsernameResponse) XXX_Unmarshal(b []byte) error {
@@ -1248,7 +1468,7 @@ func (m *AddAccountDeviceUsernameRequest) Reset()         { *m = AddAccountDevic
 func (m *AddAccountDeviceUsernameRequest) String() string { return proto.CompactTextString(m) }
 func (*AddAccountDeviceUsernameRequest) ProtoMessage()    {}
 func (*AddAccountDeviceUsernameRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{28}
+	return fileDescriptor_efc1ff1bbf92a481, []int{32}
 }
 
 func (m *AddAccountDeviceUsernameRequest) XXX_Unmarshal(b []byte) error {
@@ -1293,7 +1513,7 @@ func (m *AddAccountDeviceUsernameResponse) Reset()         { *m = AddAccountDevi
 func (m *AddAccountDeviceUsernameResponse) String() string { return proto.CompactTextString(m) }
 func (*AddAccountDeviceUsernameResponse) ProtoMessage()    {}
 func (*AddAccountDeviceUsernameResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{29}
+	return fileDescriptor_efc1ff1bbf92a481, []int{33}
 }
 
 func (m *AddAccountDeviceUsernameResponse) XXX_Unmarshal(b []byte) error {
@@ -1326,7 +1546,7 @@ func (m *RemoveAccountDeviceUsernameRequest) Reset()         { *m = RemoveAccoun
 func (m *RemoveAccountDeviceUsernameRequest) String() string { return proto.CompactTextString(m) }
 func (*RemoveAccountDeviceUsernameRequest) ProtoMessage()    {}
 func (*RemoveAccountDeviceUsernameRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{30}
+	return fileDescriptor_efc1ff1bbf92a481, []int{34}
 }
 
 func (m *RemoveAccountDeviceUsernameRequest) XXX_Unmarshal(b []byte) error {
@@ -1371,7 +1591,7 @@ func (m *RemoveAccountDeviceUsernameResponse) Reset()         { *m = RemoveAccou
 func (m *RemoveAccountDeviceUsernameResponse) String() string { return proto.CompactTextString(m) }
 func (*RemoveAccountDeviceUsernameResponse) ProtoMessage()    {}
 func (*RemoveAccountDeviceUsernameResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{31}
+	return fileDescriptor_efc1ff1bbf92a481, []int{35}
 }
 
 func (m *RemoveAccountDeviceUsernameResponse) XXX_Unmarshal(b []byte) error {
@@ -1392,6 +1612,636 @@ func (m *RemoveAccountDeviceUsernameResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RemoveAccountDeviceUsernameResponse proto.InternalMessageInfo
 
+type CreateApplicationRequest struct {
+	AccountID            string   `protobuf:"bytes,1,opt,name=AccountID,proto3" json:"AccountID,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateApplicationRequest) Reset()         { *m = CreateApplicationRequest{} }
+func (m *CreateApplicationRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateApplicationRequest) ProtoMessage()    {}
+func (*CreateApplicationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{36}
+}
+
+func (m *CreateApplicationRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateApplicationRequest.Unmarshal(m, b)
+}
+func (m *CreateApplicationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateApplicationRequest.Marshal(b, m, deterministic)
+}
+func (m *CreateApplicationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateApplicationRequest.Merge(m, src)
+}
+func (m *CreateApplicationRequest) XXX_Size() int {
+	return xxx_messageInfo_CreateApplicationRequest.Size(m)
+}
+func (m *CreateApplicationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateApplicationRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateApplicationRequest proto.InternalMessageInfo
+
+func (m *CreateApplicationRequest) GetAccountID() string {
+	if m != nil {
+		return m.AccountID
+	}
+	return ""
+}
+
+func (m *CreateApplicationRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type CreateApplicationResponse struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateApplicationResponse) Reset()         { *m = CreateApplicationResponse{} }
+func (m *CreateApplicationResponse) String() string { return proto.CompactTextString(m) }
+func (*CreateApplicationResponse) ProtoMessage()    {}
+func (*CreateApplicationResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{37}
+}
+
+func (m *CreateApplicationResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateApplicationResponse.Unmarshal(m, b)
+}
+func (m *CreateApplicationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateApplicationResponse.Marshal(b, m, deterministic)
+}
+func (m *CreateApplicationResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateApplicationResponse.Merge(m, src)
+}
+func (m *CreateApplicationResponse) XXX_Size() int {
+	return xxx_messageInfo_CreateApplicationResponse.Size(m)
+}
+func (m *CreateApplicationResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateApplicationResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateApplicationResponse proto.InternalMessageInfo
+
+func (m *CreateApplicationResponse) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+type DeleteApplicationRequest struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteApplicationRequest) Reset()         { *m = DeleteApplicationRequest{} }
+func (m *DeleteApplicationRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteApplicationRequest) ProtoMessage()    {}
+func (*DeleteApplicationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{38}
+}
+
+func (m *DeleteApplicationRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteApplicationRequest.Unmarshal(m, b)
+}
+func (m *DeleteApplicationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteApplicationRequest.Marshal(b, m, deterministic)
+}
+func (m *DeleteApplicationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteApplicationRequest.Merge(m, src)
+}
+func (m *DeleteApplicationRequest) XXX_Size() int {
+	return xxx_messageInfo_DeleteApplicationRequest.Size(m)
+}
+func (m *DeleteApplicationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteApplicationRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteApplicationRequest proto.InternalMessageInfo
+
+func (m *DeleteApplicationRequest) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+type DeleteApplicationResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteApplicationResponse) Reset()         { *m = DeleteApplicationResponse{} }
+func (m *DeleteApplicationResponse) String() string { return proto.CompactTextString(m) }
+func (*DeleteApplicationResponse) ProtoMessage()    {}
+func (*DeleteApplicationResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{39}
+}
+
+func (m *DeleteApplicationResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteApplicationResponse.Unmarshal(m, b)
+}
+func (m *DeleteApplicationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteApplicationResponse.Marshal(b, m, deterministic)
+}
+func (m *DeleteApplicationResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteApplicationResponse.Merge(m, src)
+}
+func (m *DeleteApplicationResponse) XXX_Size() int {
+	return xxx_messageInfo_DeleteApplicationResponse.Size(m)
+}
+func (m *DeleteApplicationResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteApplicationResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteApplicationResponse proto.InternalMessageInfo
+
+type CreateApplicationProfileRequest struct {
+	AccountID            string   `protobuf:"bytes,1,opt,name=AccountID,proto3" json:"AccountID,omitempty"`
+	ApplicationID        string   `protobuf:"bytes,2,opt,name=ApplicationID,proto3" json:"ApplicationID,omitempty"`
+	Name                 string   `protobuf:"bytes,3,opt,name=Name,proto3" json:"Name,omitempty"`
+	Password             string   `protobuf:"bytes,5,opt,name=Password,proto3" json:"Password,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateApplicationProfileRequest) Reset()         { *m = CreateApplicationProfileRequest{} }
+func (m *CreateApplicationProfileRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateApplicationProfileRequest) ProtoMessage()    {}
+func (*CreateApplicationProfileRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{40}
+}
+
+func (m *CreateApplicationProfileRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateApplicationProfileRequest.Unmarshal(m, b)
+}
+func (m *CreateApplicationProfileRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateApplicationProfileRequest.Marshal(b, m, deterministic)
+}
+func (m *CreateApplicationProfileRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateApplicationProfileRequest.Merge(m, src)
+}
+func (m *CreateApplicationProfileRequest) XXX_Size() int {
+	return xxx_messageInfo_CreateApplicationProfileRequest.Size(m)
+}
+func (m *CreateApplicationProfileRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateApplicationProfileRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateApplicationProfileRequest proto.InternalMessageInfo
+
+func (m *CreateApplicationProfileRequest) GetAccountID() string {
+	if m != nil {
+		return m.AccountID
+	}
+	return ""
+}
+
+func (m *CreateApplicationProfileRequest) GetApplicationID() string {
+	if m != nil {
+		return m.ApplicationID
+	}
+	return ""
+}
+
+func (m *CreateApplicationProfileRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *CreateApplicationProfileRequest) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+type CreateApplicationProfileResponse struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateApplicationProfileResponse) Reset()         { *m = CreateApplicationProfileResponse{} }
+func (m *CreateApplicationProfileResponse) String() string { return proto.CompactTextString(m) }
+func (*CreateApplicationProfileResponse) ProtoMessage()    {}
+func (*CreateApplicationProfileResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{41}
+}
+
+func (m *CreateApplicationProfileResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateApplicationProfileResponse.Unmarshal(m, b)
+}
+func (m *CreateApplicationProfileResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateApplicationProfileResponse.Marshal(b, m, deterministic)
+}
+func (m *CreateApplicationProfileResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateApplicationProfileResponse.Merge(m, src)
+}
+func (m *CreateApplicationProfileResponse) XXX_Size() int {
+	return xxx_messageInfo_CreateApplicationProfileResponse.Size(m)
+}
+func (m *CreateApplicationProfileResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateApplicationProfileResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateApplicationProfileResponse proto.InternalMessageInfo
+
+func (m *CreateApplicationProfileResponse) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+type DeleteApplicationProfileRequest struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteApplicationProfileRequest) Reset()         { *m = DeleteApplicationProfileRequest{} }
+func (m *DeleteApplicationProfileRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteApplicationProfileRequest) ProtoMessage()    {}
+func (*DeleteApplicationProfileRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{42}
+}
+
+func (m *DeleteApplicationProfileRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteApplicationProfileRequest.Unmarshal(m, b)
+}
+func (m *DeleteApplicationProfileRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteApplicationProfileRequest.Marshal(b, m, deterministic)
+}
+func (m *DeleteApplicationProfileRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteApplicationProfileRequest.Merge(m, src)
+}
+func (m *DeleteApplicationProfileRequest) XXX_Size() int {
+	return xxx_messageInfo_DeleteApplicationProfileRequest.Size(m)
+}
+func (m *DeleteApplicationProfileRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteApplicationProfileRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteApplicationProfileRequest proto.InternalMessageInfo
+
+func (m *DeleteApplicationProfileRequest) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+type DeleteApplicationProfileResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteApplicationProfileResponse) Reset()         { *m = DeleteApplicationProfileResponse{} }
+func (m *DeleteApplicationProfileResponse) String() string { return proto.CompactTextString(m) }
+func (*DeleteApplicationProfileResponse) ProtoMessage()    {}
+func (*DeleteApplicationProfileResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{43}
+}
+
+func (m *DeleteApplicationProfileResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteApplicationProfileResponse.Unmarshal(m, b)
+}
+func (m *DeleteApplicationProfileResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteApplicationProfileResponse.Marshal(b, m, deterministic)
+}
+func (m *DeleteApplicationProfileResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteApplicationProfileResponse.Merge(m, src)
+}
+func (m *DeleteApplicationProfileResponse) XXX_Size() int {
+	return xxx_messageInfo_DeleteApplicationProfileResponse.Size(m)
+}
+func (m *DeleteApplicationProfileResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteApplicationProfileResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteApplicationProfileResponse proto.InternalMessageInfo
+
+type ListApplicationProfilesRequest struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListApplicationProfilesRequest) Reset()         { *m = ListApplicationProfilesRequest{} }
+func (m *ListApplicationProfilesRequest) String() string { return proto.CompactTextString(m) }
+func (*ListApplicationProfilesRequest) ProtoMessage()    {}
+func (*ListApplicationProfilesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{44}
+}
+
+func (m *ListApplicationProfilesRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListApplicationProfilesRequest.Unmarshal(m, b)
+}
+func (m *ListApplicationProfilesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListApplicationProfilesRequest.Marshal(b, m, deterministic)
+}
+func (m *ListApplicationProfilesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListApplicationProfilesRequest.Merge(m, src)
+}
+func (m *ListApplicationProfilesRequest) XXX_Size() int {
+	return xxx_messageInfo_ListApplicationProfilesRequest.Size(m)
+}
+func (m *ListApplicationProfilesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListApplicationProfilesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListApplicationProfilesRequest proto.InternalMessageInfo
+
+type ListApplicationProfilesResponse struct {
+	ApplicationProfiles  []*ApplicationProfile `protobuf:"bytes,1,rep,name=ApplicationProfiles,proto3" json:"ApplicationProfiles,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
+	XXX_unrecognized     []byte                `json:"-"`
+	XXX_sizecache        int32                 `json:"-"`
+}
+
+func (m *ListApplicationProfilesResponse) Reset()         { *m = ListApplicationProfilesResponse{} }
+func (m *ListApplicationProfilesResponse) String() string { return proto.CompactTextString(m) }
+func (*ListApplicationProfilesResponse) ProtoMessage()    {}
+func (*ListApplicationProfilesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{45}
+}
+
+func (m *ListApplicationProfilesResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListApplicationProfilesResponse.Unmarshal(m, b)
+}
+func (m *ListApplicationProfilesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListApplicationProfilesResponse.Marshal(b, m, deterministic)
+}
+func (m *ListApplicationProfilesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListApplicationProfilesResponse.Merge(m, src)
+}
+func (m *ListApplicationProfilesResponse) XXX_Size() int {
+	return xxx_messageInfo_ListApplicationProfilesResponse.Size(m)
+}
+func (m *ListApplicationProfilesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListApplicationProfilesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListApplicationProfilesResponse proto.InternalMessageInfo
+
+func (m *ListApplicationProfilesResponse) GetApplicationProfiles() []*ApplicationProfile {
+	if m != nil {
+		return m.ApplicationProfiles
+	}
+	return nil
+}
+
+type ListApplicationProfilesByAccountIDRequest struct {
+	AccountID            string   `protobuf:"bytes,1,opt,name=AccountID,proto3" json:"AccountID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListApplicationProfilesByAccountIDRequest) Reset() {
+	*m = ListApplicationProfilesByAccountIDRequest{}
+}
+func (m *ListApplicationProfilesByAccountIDRequest) String() string { return proto.CompactTextString(m) }
+func (*ListApplicationProfilesByAccountIDRequest) ProtoMessage()    {}
+func (*ListApplicationProfilesByAccountIDRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{46}
+}
+
+func (m *ListApplicationProfilesByAccountIDRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListApplicationProfilesByAccountIDRequest.Unmarshal(m, b)
+}
+func (m *ListApplicationProfilesByAccountIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListApplicationProfilesByAccountIDRequest.Marshal(b, m, deterministic)
+}
+func (m *ListApplicationProfilesByAccountIDRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListApplicationProfilesByAccountIDRequest.Merge(m, src)
+}
+func (m *ListApplicationProfilesByAccountIDRequest) XXX_Size() int {
+	return xxx_messageInfo_ListApplicationProfilesByAccountIDRequest.Size(m)
+}
+func (m *ListApplicationProfilesByAccountIDRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListApplicationProfilesByAccountIDRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListApplicationProfilesByAccountIDRequest proto.InternalMessageInfo
+
+func (m *ListApplicationProfilesByAccountIDRequest) GetAccountID() string {
+	if m != nil {
+		return m.AccountID
+	}
+	return ""
+}
+
+type ListApplicationProfilesByAccountIDResponse struct {
+	ApplicationProfiles  []*ApplicationProfile `protobuf:"bytes,1,rep,name=ApplicationProfiles,proto3" json:"ApplicationProfiles,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
+	XXX_unrecognized     []byte                `json:"-"`
+	XXX_sizecache        int32                 `json:"-"`
+}
+
+func (m *ListApplicationProfilesByAccountIDResponse) Reset() {
+	*m = ListApplicationProfilesByAccountIDResponse{}
+}
+func (m *ListApplicationProfilesByAccountIDResponse) String() string {
+	return proto.CompactTextString(m)
+}
+func (*ListApplicationProfilesByAccountIDResponse) ProtoMessage() {}
+func (*ListApplicationProfilesByAccountIDResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{47}
+}
+
+func (m *ListApplicationProfilesByAccountIDResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListApplicationProfilesByAccountIDResponse.Unmarshal(m, b)
+}
+func (m *ListApplicationProfilesByAccountIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListApplicationProfilesByAccountIDResponse.Marshal(b, m, deterministic)
+}
+func (m *ListApplicationProfilesByAccountIDResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListApplicationProfilesByAccountIDResponse.Merge(m, src)
+}
+func (m *ListApplicationProfilesByAccountIDResponse) XXX_Size() int {
+	return xxx_messageInfo_ListApplicationProfilesByAccountIDResponse.Size(m)
+}
+func (m *ListApplicationProfilesByAccountIDResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListApplicationProfilesByAccountIDResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListApplicationProfilesByAccountIDResponse proto.InternalMessageInfo
+
+func (m *ListApplicationProfilesByAccountIDResponse) GetApplicationProfiles() []*ApplicationProfile {
+	if m != nil {
+		return m.ApplicationProfiles
+	}
+	return nil
+}
+
+type ListApplicationsRequest struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListApplicationsRequest) Reset()         { *m = ListApplicationsRequest{} }
+func (m *ListApplicationsRequest) String() string { return proto.CompactTextString(m) }
+func (*ListApplicationsRequest) ProtoMessage()    {}
+func (*ListApplicationsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{48}
+}
+
+func (m *ListApplicationsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListApplicationsRequest.Unmarshal(m, b)
+}
+func (m *ListApplicationsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListApplicationsRequest.Marshal(b, m, deterministic)
+}
+func (m *ListApplicationsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListApplicationsRequest.Merge(m, src)
+}
+func (m *ListApplicationsRequest) XXX_Size() int {
+	return xxx_messageInfo_ListApplicationsRequest.Size(m)
+}
+func (m *ListApplicationsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListApplicationsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListApplicationsRequest proto.InternalMessageInfo
+
+type ListApplicationsResponse struct {
+	Applications         []*Application `protobuf:"bytes,1,rep,name=Applications,proto3" json:"Applications,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *ListApplicationsResponse) Reset()         { *m = ListApplicationsResponse{} }
+func (m *ListApplicationsResponse) String() string { return proto.CompactTextString(m) }
+func (*ListApplicationsResponse) ProtoMessage()    {}
+func (*ListApplicationsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{49}
+}
+
+func (m *ListApplicationsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListApplicationsResponse.Unmarshal(m, b)
+}
+func (m *ListApplicationsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListApplicationsResponse.Marshal(b, m, deterministic)
+}
+func (m *ListApplicationsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListApplicationsResponse.Merge(m, src)
+}
+func (m *ListApplicationsResponse) XXX_Size() int {
+	return xxx_messageInfo_ListApplicationsResponse.Size(m)
+}
+func (m *ListApplicationsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListApplicationsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListApplicationsResponse proto.InternalMessageInfo
+
+func (m *ListApplicationsResponse) GetApplications() []*Application {
+	if m != nil {
+		return m.Applications
+	}
+	return nil
+}
+
+type ListApplicationsByAccountIDRequest struct {
+	AccountID            string   `protobuf:"bytes,1,opt,name=AccountID,proto3" json:"AccountID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListApplicationsByAccountIDRequest) Reset()         { *m = ListApplicationsByAccountIDRequest{} }
+func (m *ListApplicationsByAccountIDRequest) String() string { return proto.CompactTextString(m) }
+func (*ListApplicationsByAccountIDRequest) ProtoMessage()    {}
+func (*ListApplicationsByAccountIDRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{50}
+}
+
+func (m *ListApplicationsByAccountIDRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListApplicationsByAccountIDRequest.Unmarshal(m, b)
+}
+func (m *ListApplicationsByAccountIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListApplicationsByAccountIDRequest.Marshal(b, m, deterministic)
+}
+func (m *ListApplicationsByAccountIDRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListApplicationsByAccountIDRequest.Merge(m, src)
+}
+func (m *ListApplicationsByAccountIDRequest) XXX_Size() int {
+	return xxx_messageInfo_ListApplicationsByAccountIDRequest.Size(m)
+}
+func (m *ListApplicationsByAccountIDRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListApplicationsByAccountIDRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListApplicationsByAccountIDRequest proto.InternalMessageInfo
+
+func (m *ListApplicationsByAccountIDRequest) GetAccountID() string {
+	if m != nil {
+		return m.AccountID
+	}
+	return ""
+}
+
+type ListApplicationsByAccountIDResponse struct {
+	Applications         []*Application `protobuf:"bytes,1,rep,name=Applications,proto3" json:"Applications,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *ListApplicationsByAccountIDResponse) Reset()         { *m = ListApplicationsByAccountIDResponse{} }
+func (m *ListApplicationsByAccountIDResponse) String() string { return proto.CompactTextString(m) }
+func (*ListApplicationsByAccountIDResponse) ProtoMessage()    {}
+func (*ListApplicationsByAccountIDResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_efc1ff1bbf92a481, []int{51}
+}
+
+func (m *ListApplicationsByAccountIDResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListApplicationsByAccountIDResponse.Unmarshal(m, b)
+}
+func (m *ListApplicationsByAccountIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListApplicationsByAccountIDResponse.Marshal(b, m, deterministic)
+}
+func (m *ListApplicationsByAccountIDResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListApplicationsByAccountIDResponse.Merge(m, src)
+}
+func (m *ListApplicationsByAccountIDResponse) XXX_Size() int {
+	return xxx_messageInfo_ListApplicationsByAccountIDResponse.Size(m)
+}
+func (m *ListApplicationsByAccountIDResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListApplicationsByAccountIDResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListApplicationsByAccountIDResponse proto.InternalMessageInfo
+
+func (m *ListApplicationsByAccountIDResponse) GetApplications() []*Application {
+	if m != nil {
+		return m.Applications
+	}
+	return nil
+}
+
 type ShutdownRequest struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1402,7 +2252,7 @@ func (m *ShutdownRequest) Reset()         { *m = ShutdownRequest{} }
 func (m *ShutdownRequest) String() string { return proto.CompactTextString(m) }
 func (*ShutdownRequest) ProtoMessage()    {}
 func (*ShutdownRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{32}
+	return fileDescriptor_efc1ff1bbf92a481, []int{52}
 }
 
 func (m *ShutdownRequest) XXX_Unmarshal(b []byte) error {
@@ -1433,7 +2283,7 @@ func (m *ShutdownResponse) Reset()         { *m = ShutdownResponse{} }
 func (m *ShutdownResponse) String() string { return proto.CompactTextString(m) }
 func (*ShutdownResponse) ProtoMessage()    {}
 func (*ShutdownResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{33}
+	return fileDescriptor_efc1ff1bbf92a481, []int{53}
 }
 
 func (m *ShutdownResponse) XXX_Unmarshal(b []byte) error {
@@ -1466,7 +2316,7 @@ func (m *VespiaryEventAttribute) Reset()         { *m = VespiaryEventAttribute{}
 func (m *VespiaryEventAttribute) String() string { return proto.CompactTextString(m) }
 func (*VespiaryEventAttribute) ProtoMessage()    {}
 func (*VespiaryEventAttribute) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{34}
+	return fileDescriptor_efc1ff1bbf92a481, []int{54}
 }
 
 func (m *VespiaryEventAttribute) XXX_Unmarshal(b []byte) error {
@@ -1515,7 +2365,7 @@ func (m *VespiaryAuditEvent) Reset()         { *m = VespiaryAuditEvent{} }
 func (m *VespiaryAuditEvent) String() string { return proto.CompactTextString(m) }
 func (*VespiaryAuditEvent) ProtoMessage()    {}
 func (*VespiaryAuditEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{35}
+	return fileDescriptor_efc1ff1bbf92a481, []int{55}
 }
 
 func (m *VespiaryAuditEvent) XXX_Unmarshal(b []byte) error {
@@ -1575,7 +2425,7 @@ func (m *PutVespiaryEventRequest) Reset()         { *m = PutVespiaryEventRequest
 func (m *PutVespiaryEventRequest) String() string { return proto.CompactTextString(m) }
 func (*PutVespiaryEventRequest) ProtoMessage()    {}
 func (*PutVespiaryEventRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{36}
+	return fileDescriptor_efc1ff1bbf92a481, []int{56}
 }
 
 func (m *PutVespiaryEventRequest) XXX_Unmarshal(b []byte) error {
@@ -1613,7 +2463,7 @@ func (m *PutVespiaryEventsResponse) Reset()         { *m = PutVespiaryEventsResp
 func (m *PutVespiaryEventsResponse) String() string { return proto.CompactTextString(m) }
 func (*PutVespiaryEventsResponse) ProtoMessage()    {}
 func (*PutVespiaryEventsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_efc1ff1bbf92a481, []int{37}
+	return fileDescriptor_efc1ff1bbf92a481, []int{57}
 }
 
 func (m *PutVespiaryEventsResponse) XXX_Unmarshal(b []byte) error {
@@ -1639,6 +2489,10 @@ func init() {
 	proto.RegisterType((*AccountSet)(nil), "api.AccountSet")
 	proto.RegisterType((*DeviceSet)(nil), "api.DeviceSet")
 	proto.RegisterType((*Device)(nil), "api.Device")
+	proto.RegisterType((*Application)(nil), "api.Application")
+	proto.RegisterType((*ApplicationSet)(nil), "api.ApplicationSet")
+	proto.RegisterType((*ApplicationProfile)(nil), "api.ApplicationProfile")
+	proto.RegisterType((*ApplicationProfileSet)(nil), "api.ApplicationProfileSet")
 	proto.RegisterType((*CreateDeviceRequest)(nil), "api.CreateDeviceRequest")
 	proto.RegisterType((*CreateDeviceResponse)(nil), "api.CreateDeviceResponse")
 	proto.RegisterType((*DeleteDeviceRequest)(nil), "api.DeleteDeviceRequest")
@@ -1667,6 +2521,22 @@ func init() {
 	proto.RegisterType((*AddAccountDeviceUsernameResponse)(nil), "api.AddAccountDeviceUsernameResponse")
 	proto.RegisterType((*RemoveAccountDeviceUsernameRequest)(nil), "api.RemoveAccountDeviceUsernameRequest")
 	proto.RegisterType((*RemoveAccountDeviceUsernameResponse)(nil), "api.RemoveAccountDeviceUsernameResponse")
+	proto.RegisterType((*CreateApplicationRequest)(nil), "api.CreateApplicationRequest")
+	proto.RegisterType((*CreateApplicationResponse)(nil), "api.CreateApplicationResponse")
+	proto.RegisterType((*DeleteApplicationRequest)(nil), "api.DeleteApplicationRequest")
+	proto.RegisterType((*DeleteApplicationResponse)(nil), "api.DeleteApplicationResponse")
+	proto.RegisterType((*CreateApplicationProfileRequest)(nil), "api.CreateApplicationProfileRequest")
+	proto.RegisterType((*CreateApplicationProfileResponse)(nil), "api.CreateApplicationProfileResponse")
+	proto.RegisterType((*DeleteApplicationProfileRequest)(nil), "api.DeleteApplicationProfileRequest")
+	proto.RegisterType((*DeleteApplicationProfileResponse)(nil), "api.DeleteApplicationProfileResponse")
+	proto.RegisterType((*ListApplicationProfilesRequest)(nil), "api.ListApplicationProfilesRequest")
+	proto.RegisterType((*ListApplicationProfilesResponse)(nil), "api.ListApplicationProfilesResponse")
+	proto.RegisterType((*ListApplicationProfilesByAccountIDRequest)(nil), "api.ListApplicationProfilesByAccountIDRequest")
+	proto.RegisterType((*ListApplicationProfilesByAccountIDResponse)(nil), "api.ListApplicationProfilesByAccountIDResponse")
+	proto.RegisterType((*ListApplicationsRequest)(nil), "api.ListApplicationsRequest")
+	proto.RegisterType((*ListApplicationsResponse)(nil), "api.ListApplicationsResponse")
+	proto.RegisterType((*ListApplicationsByAccountIDRequest)(nil), "api.ListApplicationsByAccountIDRequest")
+	proto.RegisterType((*ListApplicationsByAccountIDResponse)(nil), "api.ListApplicationsByAccountIDResponse")
 	proto.RegisterType((*ShutdownRequest)(nil), "api.ShutdownRequest")
 	proto.RegisterType((*ShutdownResponse)(nil), "api.ShutdownResponse")
 	proto.RegisterType((*VespiaryEventAttribute)(nil), "api.VespiaryEventAttribute")
@@ -1678,72 +2548,99 @@ func init() {
 func init() { proto.RegisterFile("vespiary.proto", fileDescriptor_efc1ff1bbf92a481) }
 
 var fileDescriptor_efc1ff1bbf92a481 = []byte{
-	// 1033 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x57, 0xdd, 0x6f, 0xdb, 0x36,
-	0x10, 0x9f, 0x2c, 0xd7, 0xb5, 0xcf, 0xfd, 0x48, 0x18, 0x3b, 0x91, 0x19, 0x2f, 0x73, 0xd8, 0x25,
-	0x35, 0xf6, 0x90, 0x01, 0x1e, 0x30, 0x74, 0x6b, 0x80, 0xc5, 0x8b, 0xdb, 0xa0, 0x6b, 0x97, 0x05,
-	0x4a, 0xd7, 0x97, 0x01, 0x03, 0x14, 0x9b, 0x68, 0x05, 0xd8, 0x92, 0x27, 0xd1, 0x0e, 0xf2, 0x7f,
-	0x6c, 0x4f, 0xfb, 0x53, 0xf7, 0x32, 0x88, 0x3a, 0xea, 0x2b, 0x94, 0xf3, 0x81, 0xbe, 0x99, 0xc7,
-	0xbb, 0xdf, 0xfd, 0x78, 0x3c, 0xfd, 0x8e, 0x86, 0x27, 0x4b, 0x1e, 0xce, 0x5d, 0x27, 0xb8, 0x3a,
-	0x98, 0x07, 0xbe, 0xf0, 0x89, 0xe9, 0xcc, 0x5d, 0xf6, 0x8f, 0x01, 0x0f, 0x87, 0xe3, 0xb1, 0xbf,
-	0xf0, 0x04, 0x79, 0x02, 0x95, 0x37, 0x23, 0xcb, 0xe8, 0x19, 0xfd, 0x86, 0x5d, 0x79, 0x33, 0x22,
-	0x04, 0xaa, 0xa7, 0xce, 0x8c, 0x5b, 0x15, 0x69, 0x91, 0xbf, 0xc9, 0x0e, 0xc0, 0x59, 0xe0, 0x7a,
-	0x63, 0x77, 0xee, 0x4c, 0x43, 0xcb, 0xec, 0x99, 0xfd, 0x86, 0x9d, 0xb1, 0x90, 0x3e, 0x3c, 0x1d,
-	0xf1, 0xa5, 0x3b, 0xe6, 0xbf, 0x87, 0x3c, 0xf0, 0x9c, 0x19, 0x0f, 0xad, 0xaa, 0x74, 0x2a, 0x9a,
-	0x49, 0x17, 0x1a, 0xc7, 0x01, 0x77, 0x04, 0x9f, 0x0c, 0x85, 0xf5, 0xa0, 0x67, 0xf4, 0x4d, 0x3b,
-	0x35, 0xb0, 0xef, 0x01, 0x90, 0xd6, 0x39, 0x17, 0xa4, 0x0f, 0x75, 0x5c, 0x85, 0x96, 0xd1, 0x33,
-	0xfb, 0xcd, 0xc1, 0xa3, 0x03, 0x67, 0xee, 0x1e, 0xa0, 0xd1, 0x4e, 0x76, 0xd9, 0x00, 0x1a, 0x71,
-	0xa2, 0x28, 0x6c, 0x0f, 0x1e, 0xc6, 0x0b, 0x15, 0xd5, 0x94, 0x51, 0xb1, 0xcd, 0x56, 0x7b, 0xec,
-	0x6f, 0x03, 0x6a, 0xf1, 0x6f, 0xd2, 0x82, 0x07, 0xbf, 0x5d, 0x7a, 0x3c, 0xc0, 0x2a, 0xc4, 0x0b,
-	0x2c, 0x4c, 0xe5, 0x5a, 0x61, 0xcc, 0x4c, 0x61, 0x36, 0xa1, 0x36, 0x1c, 0x0b, 0x77, 0xc9, 0xad,
-	0x6a, 0xcf, 0xe8, 0xd7, 0x6d, 0x5c, 0xad, 0x3e, 0x26, 0xa1, 0x50, 0x3f, 0x73, 0xc2, 0xf0, 0xd2,
-	0x0f, 0x26, 0x56, 0x4d, 0xa2, 0x25, 0x6b, 0x16, 0xc2, 0x46, 0xec, 0x88, 0x7c, 0xf9, 0x5f, 0x0b,
-	0x1e, 0x8a, 0x12, 0x8a, 0xba, 0xbb, 0x4a, 0x29, 0x99, 0x39, 0x4a, 0xd9, 0xa4, 0xd5, 0x42, 0xd2,
-	0x7d, 0x68, 0xe5, 0x93, 0x86, 0x73, 0xdf, 0x0b, 0x79, 0xb1, 0x37, 0xd8, 0x4b, 0xd8, 0x18, 0xf1,
-	0x29, 0xbf, 0x1d, 0xb9, 0x42, 0xfd, 0xa2, 0x24, 0xf9, 0xe0, 0x92, 0x24, 0xdf, 0x00, 0x79, 0xe7,
-	0x86, 0x02, 0xef, 0x69, 0x65, 0x0e, 0x76, 0x08, 0x1b, 0x39, 0x5f, 0x84, 0xbc, 0x65, 0x0b, 0xbc,
-	0x80, 0xb5, 0x13, 0x2e, 0xee, 0x73, 0x96, 0x17, 0xb0, 0x9e, 0x89, 0xc4, 0xac, 0xcf, 0x54, 0x43,
-	0xc9, 0xd8, 0x42, 0x52, 0xdc, 0x8a, 0x4a, 0xf8, 0xca, 0x73, 0x2e, 0xa6, 0xf7, 0x2a, 0xe1, 0x26,
-	0xb4, 0xf2, 0xc1, 0x71, 0x66, 0x76, 0x08, 0xad, 0x91, 0x1b, 0xde, 0x17, 0x75, 0x0b, 0xda, 0x85,
-	0x68, 0x84, 0xe5, 0xb0, 0x7d, 0xfc, 0xc9, 0xf1, 0x3e, 0xa2, 0x5d, 0xb5, 0xcb, 0x9d, 0xd0, 0x49,
-	0x0f, 0x9a, 0xa7, 0xfc, 0x32, 0x69, 0xbd, 0xf8, 0xeb, 0xc9, 0x9a, 0xd8, 0x0e, 0x74, 0xf5, 0x69,
-	0x90, 0x86, 0x50, 0xdd, 0xa9, 0x3e, 0x7c, 0xcc, 0xaf, 0xba, 0xdf, 0x28, 0x55, 0xaa, 0xca, 0x6d,
-	0x94, 0xca, 0xd4, 0x2a, 0x15, 0x7b, 0x0e, 0xed, 0x42, 0xd6, 0x92, 0x7e, 0x4d, 0xfa, 0xba, 0x40,
-	0xaf, 0xe8, 0x17, 0x95, 0x39, 0xef, 0x87, 0xe7, 0x6b, 0xc7, 0x4d, 0xac, 0xd4, 0x0c, 0xe3, 0xd9,
-	0x11, 0xb4, 0xf2, 0x66, 0xcc, 0x7f, 0x7b, 0x59, 0x3c, 0x84, 0xee, 0x09, 0x57, 0x00, 0x3f, 0x5f,
-	0x25, 0x65, 0x50, 0x0c, 0xbb, 0xd0, 0x48, 0x6c, 0x48, 0x34, 0x35, 0xb0, 0x13, 0xf8, 0xb2, 0x24,
-	0x1a, 0x89, 0xec, 0x27, 0x43, 0x04, 0x1b, 0x3e, 0xcf, 0x43, 0x6d, 0xb2, 0x9f, 0x60, 0x37, 0x0b,
-	0x94, 0x2f, 0xb4, 0xe2, 0x42, 0xa1, 0xae, 0x4c, 0x48, 0x25, 0x59, 0xb3, 0x77, 0xc0, 0x56, 0x01,
-	0xdc, 0x91, 0xce, 0xaf, 0xf0, 0xd5, 0x70, 0x32, 0xc1, 0x95, 0x9e, 0x4c, 0x71, 0x26, 0x66, 0xc9,
-	0x55, 0x0a, 0xe4, 0x18, 0xf4, 0xca, 0xe1, 0xf0, 0x86, 0xcf, 0x80, 0xd9, 0x7c, 0xe6, 0x2f, 0xf9,
-	0x67, 0xcb, 0xba, 0x07, 0xcf, 0x56, 0x22, 0x62, 0xe2, 0x75, 0x78, 0x7a, 0xfe, 0x69, 0x21, 0x26,
-	0xfe, 0xa5, 0xa7, 0xda, 0x8a, 0xc0, 0x5a, 0x6a, 0x42, 0xb7, 0x23, 0xd8, 0xfc, 0x80, 0xcf, 0x84,
-	0x57, 0x4b, 0xee, 0x89, 0xa1, 0x10, 0x81, 0x7b, 0xb1, 0x10, 0x9c, 0xac, 0x81, 0xf9, 0x96, 0x5f,
-	0x21, 0xa9, 0xe8, 0x67, 0xf4, 0xd5, 0x7f, 0x70, 0xa6, 0x0b, 0x45, 0x29, 0x5e, 0xb0, 0x7f, 0x0d,
-	0x20, 0x0a, 0x62, 0xb8, 0x98, 0xb8, 0x42, 0xe2, 0x44, 0x1d, 0xf6, 0xde, 0x9d, 0xf1, 0x50, 0x38,
-	0xb3, 0xb9, 0x04, 0x31, 0xed, 0xd4, 0x10, 0x8d, 0xaa, 0xf7, 0xdc, 0x73, 0x3c, 0x81, 0x58, 0xb8,
-	0x8a, 0x3e, 0xec, 0xb7, 0xae, 0xa7, 0xb4, 0x42, 0xfe, 0x26, 0x2f, 0x01, 0x12, 0x56, 0xf1, 0xeb,
-	0xa2, 0x39, 0xd8, 0x96, 0x17, 0xac, 0x67, 0x6e, 0x67, 0xdc, 0xd9, 0x2f, 0xb0, 0x75, 0xb6, 0x10,
-	0x39, 0x47, 0x55, 0xf4, 0x6f, 0xa1, 0x26, 0xd7, 0xea, 0x5b, 0xda, 0xca, 0x61, 0xa6, 0x47, 0xb1,
-	0xd1, 0x8d, 0x6d, 0x43, 0xa7, 0x88, 0x95, 0x7c, 0x9b, 0x83, 0xff, 0xea, 0x50, 0x57, 0x5b, 0xe4,
-	0x35, 0x3c, 0xce, 0x29, 0x08, 0xe9, 0x48, 0x6c, 0x9d, 0x96, 0x51, 0xaa, 0xdb, 0xc2, 0xc6, 0x7e,
-	0x0d, 0x8f, 0x73, 0xc2, 0x81, 0x38, 0x3a, 0xd1, 0x41, 0x1c, 0xad, 0xce, 0x90, 0x63, 0x78, 0x94,
-	0x15, 0x14, 0x62, 0x49, 0x5f, 0x8d, 0xf4, 0xd0, 0x8e, 0x66, 0x27, 0x05, 0xc9, 0x3e, 0x15, 0x10,
-	0x44, 0xf3, 0x64, 0xa1, 0x1d, 0xcd, 0x4e, 0x0a, 0x92, 0x7d, 0x0a, 0x20, 0x88, 0xe6, 0x69, 0x41,
-	0x3b, 0x9a, 0x1d, 0x04, 0x39, 0x82, 0x66, 0x66, 0xf6, 0x93, 0xad, 0x84, 0x73, 0xfe, 0xe5, 0x40,
-	0xad, 0xeb, 0x1b, 0x88, 0xf0, 0x23, 0x34, 0x92, 0x29, 0x4e, 0xda, 0xd2, 0xad, 0xf8, 0x1e, 0xa0,
-	0x9b, 0x45, 0x73, 0x7a, 0x84, 0xec, 0x28, 0xc6, 0x23, 0x68, 0x46, 0x3b, 0x1e, 0x41, 0x37, 0xb7,
-	0xe5, 0xcd, 0x66, 0x27, 0xaf, 0xba, 0x59, 0xcd, 0x2c, 0x57, 0x37, 0xab, 0x1b, 0xd4, 0xe4, 0x0f,
-	0x68, 0xe9, 0x26, 0x28, 0xe9, 0xc5, 0x57, 0x50, 0x3e, 0xc3, 0xe9, 0xee, 0x0a, 0x0f, 0x04, 0xff,
-	0x13, 0xda, 0xda, 0x39, 0x40, 0x76, 0x55, 0x69, 0x4a, 0x27, 0x0c, 0x65, 0xab, 0x5c, 0x10, 0x7f,
-	0x06, 0xb4, 0x5c, 0xdd, 0xc9, 0xfe, 0x35, 0x04, 0xad, 0x78, 0xd2, 0xe7, 0x37, 0xfa, 0x61, 0xba,
-	0x8f, 0x60, 0x95, 0xe9, 0x35, 0xf9, 0x3a, 0x9e, 0x18, 0xab, 0xa7, 0x03, 0xdd, 0xbb, 0xc1, 0x0b,
-	0x13, 0xcd, 0x61, 0x7b, 0x85, 0x44, 0x93, 0x98, 0xf0, 0xcd, 0x63, 0x81, 0xf6, 0x6f, 0x76, 0x44,
-	0xf5, 0x19, 0x42, 0xf5, 0xd4, 0x9f, 0x70, 0xf2, 0x03, 0xd4, 0x95, 0xc4, 0x93, 0x96, 0x8c, 0x2e,
-	0x0c, 0x01, 0xda, 0x2e, 0x58, 0x71, 0x0e, 0x7c, 0x31, 0x98, 0x42, 0x3b, 0xa7, 0x7d, 0x36, 0x1f,
-	0xfb, 0xc1, 0x84, 0x07, 0xe4, 0x1c, 0xd6, 0xaf, 0xc9, 0x1e, 0xe9, 0x4a, 0x98, 0x12, 0x69, 0xa5,
-	0x3b, 0xda, 0xdd, 0x30, 0xcd, 0x76, 0x51, 0x93, 0xff, 0x49, 0xbf, 0xfb, 0x3f, 0x00, 0x00, 0xff,
-	0xff, 0x43, 0xe8, 0x97, 0xdc, 0xa5, 0x0e, 0x00, 0x00,
+	// 1465 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x58, 0x6d, 0x73, 0xd3, 0xc6,
+	0x13, 0x47, 0x76, 0x48, 0xec, 0x4d, 0x80, 0xe4, 0x62, 0x27, 0xb2, 0x12, 0x12, 0x73, 0xe1, 0xc1,
+	0x7f, 0xfe, 0x33, 0xa1, 0x75, 0x3b, 0x1d, 0x5a, 0x98, 0x29, 0x86, 0x00, 0x93, 0x42, 0x21, 0xa3,
+	0x50, 0xde, 0x30, 0xd3, 0x19, 0xc5, 0xbe, 0x82, 0x66, 0x6c, 0xd9, 0x95, 0xe4, 0x64, 0xf2, 0x01,
+	0xfa, 0x0d, 0xca, 0xab, 0xbe, 0xef, 0xa7, 0xeb, 0x87, 0xe8, 0x48, 0xda, 0x93, 0x4e, 0xa7, 0x3b,
+	0xd9, 0x49, 0x79, 0x67, 0xed, 0xee, 0xfd, 0xf6, 0xe1, 0xf6, 0xf6, 0xc1, 0x70, 0xfd, 0x94, 0x05,
+	0x13, 0xd7, 0xf1, 0xcf, 0xf7, 0x27, 0xfe, 0x38, 0x1c, 0x93, 0xaa, 0x33, 0x71, 0xe9, 0x67, 0x03,
+	0x96, 0x7a, 0xfd, 0xfe, 0x78, 0xea, 0x85, 0xe4, 0x3a, 0x54, 0x0e, 0x0f, 0x4c, 0xa3, 0x6d, 0x74,
+	0xea, 0x76, 0xe5, 0xf0, 0x80, 0x10, 0x58, 0x78, 0xe3, 0x8c, 0x98, 0x59, 0x89, 0x29, 0xf1, 0x6f,
+	0xb2, 0x03, 0x70, 0xe4, 0xbb, 0x5e, 0xdf, 0x9d, 0x38, 0xc3, 0xc0, 0xac, 0xb6, 0xab, 0x9d, 0xba,
+	0x2d, 0x50, 0x48, 0x07, 0x6e, 0x1c, 0xb0, 0x53, 0xb7, 0xcf, 0x7e, 0x09, 0x98, 0xef, 0x39, 0x23,
+	0x16, 0x98, 0x0b, 0xb1, 0x90, 0x4c, 0x26, 0xdb, 0x50, 0x7f, 0xe6, 0x33, 0x27, 0x64, 0x83, 0x5e,
+	0x68, 0x5e, 0x6d, 0x1b, 0x9d, 0xaa, 0x9d, 0x11, 0xe8, 0x77, 0x00, 0x68, 0xd6, 0x31, 0x0b, 0x49,
+	0x07, 0x6a, 0xf8, 0x15, 0x98, 0x46, 0xbb, 0xda, 0x59, 0xee, 0xae, 0xec, 0x3b, 0x13, 0x77, 0x1f,
+	0x89, 0x76, 0xca, 0xa5, 0x5d, 0xa8, 0x27, 0x8a, 0xa2, 0x63, 0x77, 0x60, 0x29, 0xf9, 0xe0, 0xa7,
+	0x96, 0xe3, 0x53, 0x09, 0xcd, 0xe6, 0x3c, 0xfa, 0xa7, 0x01, 0x8b, 0xc9, 0x6f, 0xd2, 0x80, 0xab,
+	0x6f, 0xcf, 0x3c, 0xe6, 0x63, 0x14, 0x92, 0x0f, 0x0c, 0x4c, 0xa5, 0x10, 0x98, 0xaa, 0x10, 0x98,
+	0x0d, 0x58, 0xec, 0xf5, 0x43, 0xf7, 0x94, 0x99, 0x0b, 0x6d, 0xa3, 0x53, 0xb3, 0xf1, 0xab, 0xdc,
+	0x4d, 0x62, 0x41, 0xed, 0xc8, 0x09, 0x82, 0xb3, 0xb1, 0x3f, 0x30, 0x17, 0x63, 0xb4, 0xf4, 0x9b,
+	0xbe, 0x85, 0xe5, 0xde, 0x64, 0x32, 0x74, 0xfb, 0x4e, 0xe8, 0x8e, 0xbd, 0xc2, 0xed, 0x6c, 0x43,
+	0x1d, 0xbd, 0x4e, 0x6d, 0xcb, 0x08, 0x2a, 0x13, 0xe9, 0x0b, 0xb8, 0x2e, 0x00, 0x46, 0x01, 0xfa,
+	0x16, 0x56, 0x04, 0x0a, 0x8f, 0xd2, 0x6a, 0x12, 0xdb, 0x8c, 0x61, 0xe7, 0xa4, 0xe8, 0x3f, 0x06,
+	0x10, 0x81, 0x70, 0xe4, 0x8f, 0x7f, 0x73, 0x87, 0xec, 0x82, 0x06, 0xde, 0x86, 0x6b, 0x02, 0xc6,
+	0xe1, 0x01, 0x5a, 0x9a, 0x27, 0xa6, 0x6e, 0x2c, 0x08, 0x91, 0x36, 0x61, 0xe9, 0xb9, 0xe7, 0x9c,
+	0x0c, 0xd9, 0x20, 0x8e, 0x67, 0xcd, 0xe6, 0x9f, 0xe4, 0x2b, 0x58, 0xe7, 0xd1, 0x7b, 0xe1, 0x7a,
+	0x1f, 0x99, 0x3f, 0xf1, 0x5d, 0x2f, 0x8c, 0x03, 0xbb, 0x62, 0xab, 0x58, 0x84, 0xc2, 0x0a, 0x27,
+	0x1f, 0x3b, 0xc3, 0xd0, 0x5c, 0x8a, 0x45, 0x73, 0x34, 0x7a, 0x02, 0xcd, 0xa2, 0xb7, 0x51, 0xf4,
+	0x0e, 0x61, 0xbd, 0xc8, 0xe0, 0x41, 0xdc, 0x94, 0x83, 0x88, 0x7c, 0x5b, 0x75, 0x86, 0x06, 0xb0,
+	0x9e, 0x24, 0x05, 0xe6, 0x26, 0xfb, 0x7d, 0xca, 0x82, 0x50, 0x93, 0x8e, 0xaa, 0x77, 0x99, 0xa5,
+	0x5f, 0x35, 0x97, 0x7e, 0x62, 0x82, 0x2d, 0x48, 0x09, 0x76, 0x17, 0x1a, 0x79, 0xa5, 0xc1, 0x64,
+	0xec, 0x05, 0x85, 0x8b, 0xa4, 0x8f, 0x60, 0xfd, 0x80, 0x0d, 0xd9, 0x7c, 0xc6, 0x49, 0x6f, 0x25,
+	0x52, 0x92, 0x3f, 0xac, 0x51, 0x72, 0x1f, 0xc8, 0x6b, 0x37, 0x08, 0xf1, 0x4d, 0x96, 0xea, 0xa0,
+	0x8f, 0x61, 0x3d, 0x27, 0x8b, 0x90, 0x73, 0x3e, 0xf7, 0x87, 0xb0, 0xfa, 0x92, 0x85, 0x97, 0xf1,
+	0xe5, 0x21, 0xac, 0x09, 0x27, 0x51, 0xeb, 0x1e, 0x2f, 0x1e, 0xf1, 0x59, 0x49, 0x29, 0xb2, 0xa2,
+	0x10, 0x26, 0x49, 0x7a, 0x19, 0xb5, 0x1b, 0xd0, 0xc8, 0x1f, 0x4e, 0x34, 0xd3, 0xc7, 0xd0, 0x38,
+	0x70, 0x83, 0xcb, 0xa2, 0x6e, 0x42, 0x53, 0x3a, 0x8d, 0xb0, 0x0c, 0xb6, 0x9e, 0x7d, 0x72, 0xbc,
+	0x8f, 0x48, 0xe7, 0xe9, 0x72, 0x21, 0x74, 0xd2, 0x86, 0xe5, 0x37, 0xec, 0x2c, 0x4d, 0xbd, 0xe4,
+	0x71, 0x8b, 0x24, 0xba, 0x03, 0xdb, 0x6a, 0x35, 0x68, 0x46, 0xc8, 0xb3, 0x93, 0x17, 0x79, 0xd4,
+	0xcf, 0xb3, 0xdf, 0xd0, 0x76, 0xa5, 0xca, 0x3c, 0x5d, 0xa9, 0xaa, 0xec, 0x4a, 0xf4, 0x1e, 0x34,
+	0x25, 0xad, 0x9a, 0x7c, 0x4d, 0xf3, 0x5a, 0x32, 0x4f, 0x96, 0x8b, 0xc2, 0x9c, 0x97, 0x43, 0xff,
+	0x9a, 0x49, 0x12, 0xf3, 0xce, 0x85, 0xe7, 0xe9, 0x13, 0x68, 0xe4, 0xc9, 0xa8, 0x7f, 0xfe, 0x16,
+	0xf8, 0x18, 0xb6, 0x5f, 0x32, 0x0e, 0xf0, 0xf4, 0x3c, 0x0d, 0x03, 0xb7, 0x70, 0x1b, 0xea, 0x29,
+	0x0d, 0x0d, 0xcd, 0x08, 0xf4, 0x25, 0xdc, 0xd4, 0x9c, 0x46, 0x43, 0xee, 0xa6, 0x03, 0x03, 0x26,
+	0x7c, 0xde, 0x0e, 0xce, 0xa4, 0x3f, 0xc2, 0x2d, 0x11, 0x28, 0x1f, 0x68, 0x6e, 0x8b, 0x05, 0x35,
+	0x4e, 0x42, 0x53, 0xd2, 0x6f, 0xfa, 0x1a, 0x68, 0x19, 0xc0, 0x05, 0xcd, 0xf9, 0x19, 0x76, 0x7b,
+	0x83, 0x01, 0x7e, 0xa9, 0x8d, 0x91, 0x1b, 0x98, 0x68, 0x5c, 0x45, 0x32, 0x8e, 0x42, 0x5b, 0x0f,
+	0x87, 0x37, 0x7c, 0x04, 0xd4, 0x66, 0xa3, 0xf1, 0x29, 0xfb, 0x62, 0x5a, 0xef, 0xc0, 0x5e, 0x29,
+	0x22, 0x2a, 0x7e, 0x0d, 0x26, 0x26, 0xb1, 0xd0, 0xc3, 0xb3, 0xdb, 0xcf, 0xba, 0xb2, 0xa1, 0x1b,
+	0x1b, 0x84, 0xd6, 0x42, 0xff, 0x0f, 0x2d, 0x05, 0x9a, 0xb6, 0x8c, 0x9b, 0x98, 0xee, 0x45, 0xd5,
+	0xb2, 0xec, 0x16, 0xb4, 0x14, 0xb2, 0xe8, 0xc3, 0x67, 0x03, 0x76, 0x0b, 0x6a, 0x79, 0x0f, 0x9d,
+	0xcb, 0x97, 0xc2, 0x84, 0x51, 0x29, 0x9b, 0x30, 0xc4, 0x59, 0x4e, 0x6c, 0x9a, 0x57, 0xa5, 0xa6,
+	0xd9, 0x85, 0xb6, 0xde, 0x2c, 0x4d, 0x50, 0xbe, 0x86, 0xdd, 0x82, 0xa3, 0x92, 0x2b, 0xf2, 0x11,
+	0x0a, 0x6d, 0xfd, 0x11, 0x0c, 0x51, 0x1b, 0x76, 0xe2, 0x52, 0x51, 0x9c, 0x27, 0x78, 0x31, 0x19,
+	0xc2, 0xae, 0x56, 0x02, 0x6d, 0xfd, 0x82, 0x43, 0xcc, 0x21, 0xfc, 0x4f, 0xa3, 0xed, 0xe9, 0x79,
+	0x7a, 0x2d, 0x73, 0xdd, 0x1d, 0x3d, 0x83, 0xfb, 0xf3, 0x40, 0x7d, 0x79, 0x1f, 0x5a, 0xb0, 0x29,
+	0x29, 0x4e, 0x83, 0x79, 0x04, 0x66, 0x91, 0x85, 0x16, 0x5c, 0x6e, 0x90, 0x7e, 0x0a, 0x54, 0x46,
+	0xbc, 0x70, 0xa4, 0x3e, 0xc0, 0x5e, 0x29, 0xc6, 0x7f, 0x32, 0x70, 0x0d, 0x6e, 0x1c, 0x7f, 0x9a,
+	0x86, 0x83, 0xf1, 0x19, 0x7f, 0xc4, 0x94, 0xc0, 0x6a, 0x46, 0xc2, 0x44, 0x7c, 0x02, 0x1b, 0xef,
+	0x71, 0xb7, 0x7c, 0x7e, 0xca, 0xbc, 0xb0, 0x17, 0x86, 0xbe, 0x7b, 0x32, 0x0d, 0x19, 0x59, 0x85,
+	0xea, 0x2b, 0x76, 0x8e, 0x56, 0x47, 0x3f, 0xa3, 0xf1, 0xe1, 0xbd, 0x33, 0x9c, 0xf2, 0x12, 0x93,
+	0x7c, 0xd0, 0xbf, 0x0c, 0x20, 0x1c, 0xa2, 0x37, 0x1d, 0xb8, 0x61, 0x8c, 0x13, 0xb9, 0xfe, 0xce,
+	0x1d, 0xb1, 0x20, 0x74, 0x46, 0x93, 0x18, 0xa4, 0x6a, 0x67, 0x84, 0x68, 0xe6, 0x7d, 0xc7, 0x3c,
+	0xc7, 0x0b, 0x11, 0x0b, 0xbf, 0xa2, 0x27, 0xfd, 0xca, 0xf5, 0xf8, 0xd0, 0x11, 0xff, 0x26, 0x8f,
+	0x00, 0x52, 0xab, 0x92, 0x95, 0x74, 0xb9, 0xbb, 0x15, 0x7b, 0xaf, 0xb6, 0xdc, 0x16, 0xc4, 0xe9,
+	0x4f, 0xb0, 0x79, 0x34, 0x0d, 0x73, 0x82, 0xfc, 0x72, 0x1e, 0xc0, 0x62, 0xfc, 0x9d, 0xcf, 0xb6,
+	0xa2, 0x2b, 0x36, 0x8a, 0x45, 0x45, 0x4f, 0xc6, 0x4a, 0xd3, 0xa8, 0xfb, 0xf7, 0x0d, 0xa8, 0x71,
+	0x16, 0xb1, 0x61, 0xad, 0x50, 0x69, 0xc8, 0xcd, 0x18, 0x5f, 0x57, 0xdd, 0xad, 0x1d, 0x1d, 0x1b,
+	0xd3, 0xc0, 0x86, 0xb5, 0x42, 0x59, 0x41, 0x4c, 0x5d, 0xd9, 0x46, 0x4c, 0x6d, 0xa5, 0x26, 0x6f,
+	0x61, 0x55, 0xce, 0x40, 0xb2, 0x1d, 0x9f, 0xd1, 0xbc, 0x24, 0xeb, 0xa6, 0x86, 0x8b, 0x80, 0x13,
+	0xd8, 0x2a, 0x49, 0x69, 0x72, 0x4f, 0x79, 0xba, 0xf8, 0x70, 0xac, 0xce, 0x6c, 0x41, 0xd4, 0xf8,
+	0x51, 0xd1, 0x30, 0xf9, 0x5a, 0x7b, 0x5b, 0x1d, 0xd2, 0x7c, 0xfd, 0xb6, 0xee, 0xcc, 0x90, 0x42,
+	0x45, 0x83, 0x42, 0x79, 0xe1, 0x95, 0x87, 0xec, 0xa9, 0xac, 0x95, 0x0a, 0xba, 0x75, 0xbb, 0x5c,
+	0x08, 0xb5, 0xfc, 0x61, 0x14, 0x0a, 0x8b, 0xa2, 0x7c, 0x92, 0xfd, 0x32, 0x30, 0x45, 0x3c, 0x1f,
+	0xcc, 0x2d, 0x9f, 0x85, 0x55, 0xd7, 0xc4, 0x30, 0xac, 0x33, 0xda, 0x22, 0x86, 0x75, 0x56, 0x27,
+	0x24, 0x2f, 0xe0, 0x5a, 0x6e, 0x6a, 0x27, 0x2d, 0xf1, 0x3a, 0x72, 0x03, 0xba, 0x65, 0xa9, 0x58,
+	0x19, 0x4e, 0x6e, 0x58, 0x47, 0x1c, 0xd5, 0xa0, 0x8f, 0x38, 0xca, 0xd9, 0x9e, 0x3c, 0x83, 0x15,
+	0x71, 0x88, 0x27, 0x66, 0x16, 0xb9, 0xfc, 0xb8, 0x6f, 0xb5, 0x14, 0x9c, 0x0c, 0x44, 0x5c, 0xcf,
+	0x11, 0x44, 0xf1, 0x37, 0x81, 0xd5, 0x52, 0x70, 0x32, 0x10, 0x71, 0xfd, 0x46, 0x10, 0xc5, 0x3a,
+	0x6f, 0xb5, 0x14, 0x1c, 0x04, 0x79, 0x02, 0xcb, 0xc2, 0xbe, 0x4d, 0x36, 0x53, 0x9b, 0xf3, 0xdb,
+	0xba, 0x65, 0x16, 0x19, 0x88, 0xf0, 0x03, 0xd4, 0xd3, 0xcd, 0x99, 0x34, 0x63, 0x31, 0x79, 0x07,
+	0xb7, 0x36, 0x64, 0x72, 0xe6, 0x82, 0xb8, 0xfe, 0xa2, 0x0b, 0x8a, 0x75, 0x1a, 0x5d, 0x50, 0xed,
+	0xca, 0xf1, 0xcd, 0x8a, 0xdb, 0x2e, 0xbf, 0x59, 0xc5, 0xfe, 0xcc, 0x6f, 0x56, 0xb5, 0x1c, 0x93,
+	0x0f, 0xd0, 0x50, 0x6d, 0xad, 0xa4, 0x9d, 0x5c, 0x81, 0x7e, 0x6f, 0xb6, 0x6e, 0x95, 0x48, 0x20,
+	0xf8, 0xaf, 0xd0, 0x54, 0xee, 0x5e, 0xe4, 0x16, 0x0f, 0x8d, 0x76, 0xab, 0xb3, 0x68, 0x99, 0x08,
+	0xe2, 0x8f, 0xc0, 0xd2, 0x6f, 0x54, 0xe4, 0x6e, 0x01, 0x41, 0xb9, 0xb0, 0x58, 0xf7, 0x66, 0xca,
+	0x65, 0xcf, 0x5f, 0xb7, 0x23, 0xe1, 0xf3, 0x9f, 0xb1, 0x91, 0xe1, 0xf3, 0x9f, 0xb5, 0x68, 0x45,
+	0x0d, 0xa3, 0x64, 0x2d, 0xc2, 0x86, 0x31, 0x7b, 0x15, 0xc3, 0x86, 0x31, 0xc7, 0x86, 0xd5, 0xed,
+	0xc1, 0xc2, 0x9b, 0xf1, 0x80, 0x91, 0xef, 0xa1, 0xc6, 0xa7, 0x21, 0xd2, 0x88, 0x4f, 0x4b, 0xf3,
+	0x92, 0xd5, 0x94, 0xa8, 0x38, 0x32, 0x5d, 0xe9, 0x0e, 0xa1, 0x99, 0x1b, 0x13, 0x6c, 0xd6, 0x1f,
+	0xfb, 0x03, 0xe6, 0x93, 0x63, 0x58, 0x2b, 0x4c, 0x08, 0xd8, 0x50, 0x35, 0x53, 0x08, 0xb6, 0x68,
+	0xed, 0x5c, 0x41, 0xaf, 0x9c, 0x2c, 0xc6, 0xff, 0xf9, 0x7f, 0xf3, 0x6f, 0x00, 0x00, 0x00, 0xff,
+	0xff, 0x2b, 0x88, 0xec, 0x4d, 0x05, 0x18, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1758,6 +2655,14 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type VespiaryClient interface {
+	CreateApplication(ctx context.Context, in *CreateApplicationRequest, opts ...grpc.CallOption) (*CreateApplicationResponse, error)
+	DeleteApplication(ctx context.Context, in *DeleteApplicationRequest, opts ...grpc.CallOption) (*DeleteApplicationResponse, error)
+	ListApplications(ctx context.Context, in *ListApplicationsRequest, opts ...grpc.CallOption) (*ListApplicationsResponse, error)
+	ListApplicationsByAccountID(ctx context.Context, in *ListApplicationsByAccountIDRequest, opts ...grpc.CallOption) (*ListApplicationsByAccountIDResponse, error)
+	CreateApplicationProfile(ctx context.Context, in *CreateApplicationProfileRequest, opts ...grpc.CallOption) (*CreateApplicationProfileResponse, error)
+	ListApplicationProfiles(ctx context.Context, in *ListApplicationProfilesRequest, opts ...grpc.CallOption) (*ListApplicationProfilesResponse, error)
+	ListApplicationProfilesByAccountID(ctx context.Context, in *ListApplicationProfilesByAccountIDRequest, opts ...grpc.CallOption) (*ListApplicationProfilesByAccountIDResponse, error)
+	DeleteApplicationProfile(ctx context.Context, in *DeleteApplicationProfileRequest, opts ...grpc.CallOption) (*DeleteApplicationProfileResponse, error)
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error)
 	DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...grpc.CallOption) (*DeleteAccountResponse, error)
 	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error)
@@ -1780,6 +2685,78 @@ type vespiaryClient struct {
 
 func NewVespiaryClient(cc *grpc.ClientConn) VespiaryClient {
 	return &vespiaryClient{cc}
+}
+
+func (c *vespiaryClient) CreateApplication(ctx context.Context, in *CreateApplicationRequest, opts ...grpc.CallOption) (*CreateApplicationResponse, error) {
+	out := new(CreateApplicationResponse)
+	err := c.cc.Invoke(ctx, "/api.Vespiary/CreateApplication", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vespiaryClient) DeleteApplication(ctx context.Context, in *DeleteApplicationRequest, opts ...grpc.CallOption) (*DeleteApplicationResponse, error) {
+	out := new(DeleteApplicationResponse)
+	err := c.cc.Invoke(ctx, "/api.Vespiary/DeleteApplication", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vespiaryClient) ListApplications(ctx context.Context, in *ListApplicationsRequest, opts ...grpc.CallOption) (*ListApplicationsResponse, error) {
+	out := new(ListApplicationsResponse)
+	err := c.cc.Invoke(ctx, "/api.Vespiary/ListApplications", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vespiaryClient) ListApplicationsByAccountID(ctx context.Context, in *ListApplicationsByAccountIDRequest, opts ...grpc.CallOption) (*ListApplicationsByAccountIDResponse, error) {
+	out := new(ListApplicationsByAccountIDResponse)
+	err := c.cc.Invoke(ctx, "/api.Vespiary/ListApplicationsByAccountID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vespiaryClient) CreateApplicationProfile(ctx context.Context, in *CreateApplicationProfileRequest, opts ...grpc.CallOption) (*CreateApplicationProfileResponse, error) {
+	out := new(CreateApplicationProfileResponse)
+	err := c.cc.Invoke(ctx, "/api.Vespiary/CreateApplicationProfile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vespiaryClient) ListApplicationProfiles(ctx context.Context, in *ListApplicationProfilesRequest, opts ...grpc.CallOption) (*ListApplicationProfilesResponse, error) {
+	out := new(ListApplicationProfilesResponse)
+	err := c.cc.Invoke(ctx, "/api.Vespiary/ListApplicationProfiles", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vespiaryClient) ListApplicationProfilesByAccountID(ctx context.Context, in *ListApplicationProfilesByAccountIDRequest, opts ...grpc.CallOption) (*ListApplicationProfilesByAccountIDResponse, error) {
+	out := new(ListApplicationProfilesByAccountIDResponse)
+	err := c.cc.Invoke(ctx, "/api.Vespiary/ListApplicationProfilesByAccountID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vespiaryClient) DeleteApplicationProfile(ctx context.Context, in *DeleteApplicationProfileRequest, opts ...grpc.CallOption) (*DeleteApplicationProfileResponse, error) {
+	out := new(DeleteApplicationProfileResponse)
+	err := c.cc.Invoke(ctx, "/api.Vespiary/DeleteApplicationProfile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *vespiaryClient) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error) {
@@ -1910,6 +2887,14 @@ func (c *vespiaryClient) RemoveAccountDeviceUsername(ctx context.Context, in *Re
 
 // VespiaryServer is the server API for Vespiary service.
 type VespiaryServer interface {
+	CreateApplication(context.Context, *CreateApplicationRequest) (*CreateApplicationResponse, error)
+	DeleteApplication(context.Context, *DeleteApplicationRequest) (*DeleteApplicationResponse, error)
+	ListApplications(context.Context, *ListApplicationsRequest) (*ListApplicationsResponse, error)
+	ListApplicationsByAccountID(context.Context, *ListApplicationsByAccountIDRequest) (*ListApplicationsByAccountIDResponse, error)
+	CreateApplicationProfile(context.Context, *CreateApplicationProfileRequest) (*CreateApplicationProfileResponse, error)
+	ListApplicationProfiles(context.Context, *ListApplicationProfilesRequest) (*ListApplicationProfilesResponse, error)
+	ListApplicationProfilesByAccountID(context.Context, *ListApplicationProfilesByAccountIDRequest) (*ListApplicationProfilesByAccountIDResponse, error)
+	DeleteApplicationProfile(context.Context, *DeleteApplicationProfileRequest) (*DeleteApplicationProfileResponse, error)
 	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error)
 	DeleteAccount(context.Context, *DeleteAccountRequest) (*DeleteAccountResponse, error)
 	ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error)
@@ -1930,6 +2915,30 @@ type VespiaryServer interface {
 type UnimplementedVespiaryServer struct {
 }
 
+func (*UnimplementedVespiaryServer) CreateApplication(ctx context.Context, req *CreateApplicationRequest) (*CreateApplicationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateApplication not implemented")
+}
+func (*UnimplementedVespiaryServer) DeleteApplication(ctx context.Context, req *DeleteApplicationRequest) (*DeleteApplicationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteApplication not implemented")
+}
+func (*UnimplementedVespiaryServer) ListApplications(ctx context.Context, req *ListApplicationsRequest) (*ListApplicationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListApplications not implemented")
+}
+func (*UnimplementedVespiaryServer) ListApplicationsByAccountID(ctx context.Context, req *ListApplicationsByAccountIDRequest) (*ListApplicationsByAccountIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListApplicationsByAccountID not implemented")
+}
+func (*UnimplementedVespiaryServer) CreateApplicationProfile(ctx context.Context, req *CreateApplicationProfileRequest) (*CreateApplicationProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateApplicationProfile not implemented")
+}
+func (*UnimplementedVespiaryServer) ListApplicationProfiles(ctx context.Context, req *ListApplicationProfilesRequest) (*ListApplicationProfilesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListApplicationProfiles not implemented")
+}
+func (*UnimplementedVespiaryServer) ListApplicationProfilesByAccountID(ctx context.Context, req *ListApplicationProfilesByAccountIDRequest) (*ListApplicationProfilesByAccountIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListApplicationProfilesByAccountID not implemented")
+}
+func (*UnimplementedVespiaryServer) DeleteApplicationProfile(ctx context.Context, req *DeleteApplicationProfileRequest) (*DeleteApplicationProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteApplicationProfile not implemented")
+}
 func (*UnimplementedVespiaryServer) CreateAccount(ctx context.Context, req *CreateAccountRequest) (*CreateAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
 }
@@ -1975,6 +2984,150 @@ func (*UnimplementedVespiaryServer) RemoveAccountDeviceUsername(ctx context.Cont
 
 func RegisterVespiaryServer(s *grpc.Server, srv VespiaryServer) {
 	s.RegisterService(&_Vespiary_serviceDesc, srv)
+}
+
+func _Vespiary_CreateApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateApplicationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VespiaryServer).CreateApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Vespiary/CreateApplication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VespiaryServer).CreateApplication(ctx, req.(*CreateApplicationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Vespiary_DeleteApplication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteApplicationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VespiaryServer).DeleteApplication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Vespiary/DeleteApplication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VespiaryServer).DeleteApplication(ctx, req.(*DeleteApplicationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Vespiary_ListApplications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListApplicationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VespiaryServer).ListApplications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Vespiary/ListApplications",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VespiaryServer).ListApplications(ctx, req.(*ListApplicationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Vespiary_ListApplicationsByAccountID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListApplicationsByAccountIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VespiaryServer).ListApplicationsByAccountID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Vespiary/ListApplicationsByAccountID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VespiaryServer).ListApplicationsByAccountID(ctx, req.(*ListApplicationsByAccountIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Vespiary_CreateApplicationProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateApplicationProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VespiaryServer).CreateApplicationProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Vespiary/CreateApplicationProfile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VespiaryServer).CreateApplicationProfile(ctx, req.(*CreateApplicationProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Vespiary_ListApplicationProfiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListApplicationProfilesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VespiaryServer).ListApplicationProfiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Vespiary/ListApplicationProfiles",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VespiaryServer).ListApplicationProfiles(ctx, req.(*ListApplicationProfilesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Vespiary_ListApplicationProfilesByAccountID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListApplicationProfilesByAccountIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VespiaryServer).ListApplicationProfilesByAccountID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Vespiary/ListApplicationProfilesByAccountID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VespiaryServer).ListApplicationProfilesByAccountID(ctx, req.(*ListApplicationProfilesByAccountIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Vespiary_DeleteApplicationProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteApplicationProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VespiaryServer).DeleteApplicationProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Vespiary/DeleteApplicationProfile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VespiaryServer).DeleteApplicationProfile(ctx, req.(*DeleteApplicationProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Vespiary_CreateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -2233,6 +3386,38 @@ var _Vespiary_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "api.Vespiary",
 	HandlerType: (*VespiaryServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateApplication",
+			Handler:    _Vespiary_CreateApplication_Handler,
+		},
+		{
+			MethodName: "DeleteApplication",
+			Handler:    _Vespiary_DeleteApplication_Handler,
+		},
+		{
+			MethodName: "ListApplications",
+			Handler:    _Vespiary_ListApplications_Handler,
+		},
+		{
+			MethodName: "ListApplicationsByAccountID",
+			Handler:    _Vespiary_ListApplicationsByAccountID_Handler,
+		},
+		{
+			MethodName: "CreateApplicationProfile",
+			Handler:    _Vespiary_CreateApplicationProfile_Handler,
+		},
+		{
+			MethodName: "ListApplicationProfiles",
+			Handler:    _Vespiary_ListApplicationProfiles_Handler,
+		},
+		{
+			MethodName: "ListApplicationProfilesByAccountID",
+			Handler:    _Vespiary_ListApplicationProfilesByAccountID_Handler,
+		},
+		{
+			MethodName: "DeleteApplicationProfile",
+			Handler:    _Vespiary_DeleteApplicationProfile_Handler,
+		},
 		{
 			MethodName: "CreateAccount",
 			Handler:    _Vespiary_CreateAccount_Handler,

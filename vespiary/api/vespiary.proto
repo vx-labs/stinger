@@ -21,6 +21,25 @@ message Device {
   string Password = 6;
 }
 
+message Application {
+  string ID = 1;
+  string AccountID = 2;
+  string Name = 3;
+}
+message ApplicationSet { repeated Application Applications = 1; }
+message ApplicationProfile {
+  string ID = 1;
+  string AccountID = 2;
+  string ApplicationID = 3;
+  string Name = 4;
+  bool Enabled = 5;
+  bytes PasswordFingerprint = 6;
+  bytes PasswordSalt = 7;
+}
+message ApplicationProfileSet {
+  repeated ApplicationProfile ApplicationProfiles = 1;
+}
+
 message CreateDeviceRequest {
   string Owner = 1;
   string Name = 2;
@@ -92,10 +111,63 @@ message RemoveAccountDeviceUsernameRequest {
 }
 message RemoveAccountDeviceUsernameResponse {}
 
+message CreateApplicationRequest {
+  string AccountID = 1;
+  string Name = 2;
+}
+message CreateApplicationResponse { string ID = 1; }
+message DeleteApplicationRequest { string ID = 1; }
+message DeleteApplicationResponse {}
+
+message CreateApplicationProfileRequest {
+  string AccountID = 1;
+  string ApplicationID = 2;
+  string Name = 3;
+  string Password = 5;
+}
+message CreateApplicationProfileResponse { string ID = 1; }
+message DeleteApplicationProfileRequest { string ID = 1; }
+message DeleteApplicationProfileResponse {}
+message ListApplicationProfilesRequest {};
+message ListApplicationProfilesResponse {
+  repeated ApplicationProfile ApplicationProfiles = 1;
+};
+message ListApplicationProfilesByAccountIDRequest { string AccountID = 1; };
+message ListApplicationProfilesByAccountIDResponse {
+  repeated ApplicationProfile ApplicationProfiles = 1;
+};
+
+message ListApplicationsRequest {};
+message ListApplicationsResponse { repeated Application Applications = 1; };
+message ListApplicationsByAccountIDRequest { string AccountID = 1; };
+message ListApplicationsByAccountIDResponse {
+  repeated Application Applications = 1;
+};
+
 service Vespiary {
+  rpc CreateApplication(CreateApplicationRequest)
+      returns (CreateApplicationResponse);
+  rpc DeleteApplication(DeleteApplicationRequest)
+      returns (DeleteApplicationResponse);
+  rpc ListApplications(ListApplicationsRequest)
+      returns (ListApplicationsResponse);
+  rpc ListApplicationsByAccountID(ListApplicationsByAccountIDRequest)
+      returns (ListApplicationsByAccountIDResponse);
+
+  rpc CreateApplicationProfile(CreateApplicationProfileRequest)
+      returns (CreateApplicationProfileResponse);
+  rpc ListApplicationProfiles(ListApplicationProfilesRequest)
+      returns (ListApplicationProfilesResponse);
+  rpc ListApplicationProfilesByAccountID(
+      ListApplicationProfilesByAccountIDRequest)
+      returns (ListApplicationProfilesByAccountIDResponse);
+  rpc DeleteApplicationProfile(DeleteApplicationProfileRequest)
+      returns (DeleteApplicationProfileResponse);
+
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
   rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse);
   rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse);
+
   rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
   rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse);
   rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);

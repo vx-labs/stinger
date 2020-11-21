@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/vx-labs/vespiary/vespiary/api"
+	"github.com/vx-labs/vespiary/vespiary/state"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -19,20 +20,13 @@ type FSM interface {
 	DeleteAccount(ctx context.Context, id string) error
 	AddDeviceUsername(ctx context.Context, accountID string, deviceUsername string) error
 	RemoveDeviceUsername(ctx context.Context, accountID string, deviceUsername string) error
+	CreateApplication(ctx context.Context, accountID, name string) (string, error)
+	DeleteApplication(ctx context.Context, id string) error
+	CreateApplicationProfile(ctx context.Context, applicationID, accountID, name, password string) (string, error)
+	DeleteApplicationProfile(ctx context.Context, id string) error
 }
 
-type State interface {
-	DevicesByOwner(owner string) ([]*api.Device, error)
-	DeviceByID(owner, id string) (*api.Device, error)
-	DeviceByName(owner, name string) (*api.Device, error)
-	ListAccounts() ([]*api.Account, error)
-	AccountByName(name string) (*api.Account, error)
-	AccountByID(id string) (*api.Account, error)
-	AccountByDeviceUsername(deviceUsername string) (*api.Account, error)
-	AccountByPrincipal(principal string) (*api.Account, error)
-}
-
-func NewServer(fsm FSM, state State) *server {
+func NewServer(fsm FSM, state state.Store) *server {
 	return &server{
 		fsm:   fsm,
 		state: state,
@@ -41,7 +35,7 @@ func NewServer(fsm FSM, state State) *server {
 
 type server struct {
 	fsm   FSM
-	state State
+	state state.Store
 }
 
 func (s *server) Serve(grpcServer *grpc.Server) {
@@ -49,7 +43,7 @@ func (s *server) Serve(grpcServer *grpc.Server) {
 }
 
 func (s *server) CreateDevice(ctx context.Context, input *api.CreateDeviceRequest) (*api.CreateDeviceResponse, error) {
-	_, err := s.state.AccountByID(input.Owner)
+	_, err := s.state.Accounts().ByID(input.Owner)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "account does not exist")
 	}
@@ -102,7 +96,7 @@ func (s *server) DisableDevice(ctx context.Context, input *api.DisableDeviceRequ
 }
 
 func (s *server) ListDevices(ctx context.Context, input *api.ListDevicesRequest) (*api.ListDevicesResponse, error) {
-	_, err := s.state.AccountByID(input.Owner)
+	_, err := s.state.Accounts().ByID(input.Owner)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "account does not exist")
 	}
@@ -120,7 +114,7 @@ func (s *server) GetDevice(ctx context.Context, input *api.GetDeviceRequest) (*a
 	return &api.GetDeviceResponse{Device: device}, nil
 }
 func (s *server) ChangeDevicePassword(ctx context.Context, input *api.ChangeDevicePasswordRequest) (*api.ChangeDevicePasswordResponse, error) {
-	_, err := s.state.AccountByID(input.Owner)
+	_, err := s.state.Accounts().ByID(input.Owner)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "account does not exist")
 	}
@@ -131,7 +125,7 @@ func (s *server) ChangeDevicePassword(ctx context.Context, input *api.ChangeDevi
 	return &api.ChangeDevicePasswordResponse{}, nil
 }
 func (s *server) CreateAccount(ctx context.Context, input *api.CreateAccountRequest) (*api.CreateAccountResponse, error) {
-	_, err := s.state.AccountByName(input.Name)
+	_, err := s.state.Accounts().ByName(input.Name)
 	if err == nil {
 		return nil, status.Error(codes.AlreadyExists, "account already exists")
 	}
@@ -145,7 +139,7 @@ func (s *server) CreateAccount(ctx context.Context, input *api.CreateAccountRequ
 
 }
 func (s *server) DeleteAccount(ctx context.Context, input *api.DeleteAccountRequest) (*api.DeleteAccountResponse, error) {
-	_, err := s.state.AccountByID(input.ID)
+	_, err := s.state.Accounts().ByID(input.ID)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "account does not exist")
 	}
@@ -158,7 +152,7 @@ func (s *server) DeleteAccount(ctx context.Context, input *api.DeleteAccountRequ
 }
 
 func (s *server) ListAccounts(ctx context.Context, input *api.ListAccountsRequest) (*api.ListAccountsResponse, error) {
-	accounts, err := s.state.ListAccounts()
+	accounts, err := s.state.Accounts().All()
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +160,7 @@ func (s *server) ListAccounts(ctx context.Context, input *api.ListAccountsReques
 
 }
 func (s *server) GetAccountByPrincipal(ctx context.Context, input *api.GetAccountByPrincipalRequest) (*api.GetAccountByPrincipalResponse, error) {
-	accounts, err := s.state.AccountByPrincipal(input.Principal)
+	accounts, err := s.state.Accounts().ByPrincipal(input.Principal)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +168,7 @@ func (s *server) GetAccountByPrincipal(ctx context.Context, input *api.GetAccoun
 
 }
 func (s *server) GetAccountByDeviceUsername(ctx context.Context, input *api.GetAccountByDeviceUsernameRequest) (*api.GetAccountByDeviceUsernameResponse, error) {
-	accounts, err := s.state.AccountByDeviceUsername(input.Username)
+	accounts, err := s.state.Accounts().ByDeviceUsername(input.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +177,7 @@ func (s *server) GetAccountByDeviceUsername(ctx context.Context, input *api.GetA
 }
 
 func (s *server) AddAccountDeviceUsername(ctx context.Context, input *api.AddAccountDeviceUsernameRequest) (*api.AddAccountDeviceUsernameResponse, error) {
-	_, err := s.state.AccountByID(input.ID)
+	_, err := s.state.Accounts().ByID(input.ID)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "account does not exist")
 	}
@@ -195,7 +189,7 @@ func (s *server) AddAccountDeviceUsername(ctx context.Context, input *api.AddAcc
 
 }
 func (s *server) RemoveAccountDeviceUsername(ctx context.Context, input *api.RemoveAccountDeviceUsernameRequest) (*api.RemoveAccountDeviceUsernameResponse, error) {
-	_, err := s.state.AccountByID(input.ID)
+	_, err := s.state.Accounts().ByID(input.ID)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "account does not exist")
 	}
@@ -205,4 +199,66 @@ func (s *server) RemoveAccountDeviceUsername(ctx context.Context, input *api.Rem
 	}
 	return &api.RemoveAccountDeviceUsernameResponse{}, nil
 
+}
+
+func (s *server) CreateApplication(ctx context.Context, input *api.CreateApplicationRequest) (*api.CreateApplicationResponse, error) {
+	id, err := s.fsm.CreateApplication(ctx, input.AccountID, input.Name)
+	if err != nil {
+		return nil, err
+	}
+	return &api.CreateApplicationResponse{
+		ID: id,
+	}, nil
+}
+func (s *server) DeleteApplication(ctx context.Context, input *api.DeleteApplicationRequest) (*api.DeleteApplicationResponse, error) {
+	err := s.fsm.DeleteApplication(ctx, input.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.DeleteApplicationResponse{}, nil
+}
+func (s *server) ListApplications(ctx context.Context, input *api.ListApplicationsRequest) (*api.ListApplicationsResponse, error) {
+	out, err := s.state.Applications().All()
+	if err != nil {
+		return nil, err
+	}
+	return &api.ListApplicationsResponse{Applications: out}, nil
+}
+func (s *server) ListApplicationsByAccountID(ctx context.Context, input *api.ListApplicationsByAccountIDRequest) (*api.ListApplicationsByAccountIDResponse, error) {
+	out, err := s.state.Applications().ListByAccountID(input.AccountID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.ListApplicationsByAccountIDResponse{Applications: out}, nil
+}
+func (s *server) CreateApplicationProfile(ctx context.Context, input *api.CreateApplicationProfileRequest) (*api.CreateApplicationProfileResponse, error) {
+	id, err := s.fsm.CreateApplicationProfile(ctx, input.ApplicationID, input.AccountID, input.Name, input.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &api.CreateApplicationProfileResponse{
+		ID: id,
+	}, nil
+}
+func (s *server) ListApplicationProfiles(ctx context.Context, input *api.ListApplicationProfilesRequest) (*api.ListApplicationProfilesResponse, error) {
+	out, err := s.state.ApplicationProfiles().All()
+	if err != nil {
+		return nil, err
+	}
+	return &api.ListApplicationProfilesResponse{ApplicationProfiles: out}, nil
+}
+func (s *server) ListApplicationProfilesByAccountID(ctx context.Context, input *api.ListApplicationProfilesByAccountIDRequest) (*api.ListApplicationProfilesByAccountIDResponse, error) {
+	out, err := s.state.ApplicationProfiles().ListByAccountID(input.AccountID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.ListApplicationProfilesByAccountIDResponse{ApplicationProfiles: out}, nil
+}
+
+func (s *server) DeleteApplicationProfile(ctx context.Context, input *api.DeleteApplicationProfileRequest) (*api.DeleteApplicationProfileResponse, error) {
+	err := s.fsm.DeleteApplicationProfile(ctx, input.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.DeleteApplicationProfileResponse{}, nil
 }

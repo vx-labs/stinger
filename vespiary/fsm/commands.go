@@ -2,6 +2,8 @@ package fsm
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/sha256"
 	"errors"
 	"log"
 	"time"
@@ -13,24 +15,14 @@ import (
 	"github.com/vx-labs/cluster/raft"
 	"github.com/vx-labs/vespiary/vespiary/api"
 	"github.com/vx-labs/vespiary/vespiary/audit"
+	"github.com/vx-labs/vespiary/vespiary/state"
 )
 
 var (
-	ErrAccountDoesNotExist = errors.New("account does not exist")
+	ErrAccountDoesNotExist  = errors.New("account does not exist")
+	ErrAccountAlreadyExists = errors.New("account already exists")
+	ErrPasswordTooShort     = errors.New("password too short")
 )
-
-type State interface {
-	DeleteDevice(id, owner string) error
-	CreateDevice(device *api.Device) error
-	EnableDevice(id, owner string) error
-	DisableDevice(id, owner string) error
-	ChangeDevicePassword(id, owner, password string) error
-	CreateAccount(account *api.Account) error
-	DeleteAccount(id string) error
-	AccountByID(id string) (*api.Account, error)
-	AddDeviceUsername(account string, username string) error
-	RemoveDeviceUsername(account string, username string) error
-}
 
 func decode(payload []byte) ([]*StateTransition, error) {
 	format := StateTransitionSet{}
@@ -47,13 +39,23 @@ func encode(events ...*StateTransition) ([]byte, error) {
 	return proto.Marshal(&format)
 }
 
-func NewFSM(id uint64, state State, commandsCh chan raft.Command, recorder audit.Recorder) *FSM {
+// https://stackoverflow.com/questions/32349807/how-can-i-generate-a-random-int-using-the-crypto-rand-package/32350135
+func generateRandomBytes(n int) ([]byte, error) {
+	b := make([]byte, n)
+	_, err := rand.Read(b)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+func NewFSM(id uint64, state state.Store, commandsCh chan raft.Command, recorder audit.Recorder) *FSM {
 	return &FSM{id: id, state: state, commandsCh: commandsCh, recorder: recorder}
 }
 
 type FSM struct {
 	id         uint64
-	state      State
+	state      state.Store
 	commandsCh chan raft.Command
 	recorder   audit.Recorder
 }
@@ -112,7 +114,6 @@ func (f *FSM) record(ctx context.Context, events ...*StateTransition) error {
 			err = f.recorder.RecordEvent(tenant, audit.DevicePasswordChanged, map[string]string{
 				"device_username": input.DeviceUsername,
 			})
-		case *StateTransition_PeerLost:
 		}
 		if err != nil {
 			log.Println(err)
@@ -151,6 +152,10 @@ func (f *FSM) CreateAccount(ctx context.Context, name string, principals, device
 	if name == "" {
 		return "", errors.New("account must have a name")
 	}
+	_, err := f.state.Accounts().ByName(name)
+	if err == nil {
+		return "", ErrAccountAlreadyExists
+	}
 	id := uuid.New().String()
 	now := time.Now().UnixNano()
 	return id, f.commit(ctx, &StateTransition{Event: &StateTransition_AccountCreated{
@@ -164,7 +169,7 @@ func (f *FSM) CreateAccount(ctx context.Context, name string, principals, device
 	}})
 }
 func (f *FSM) AddDeviceUsername(ctx context.Context, accountID string, deviceUsername string) error {
-	if _, err := f.state.AccountByID(accountID); err != nil {
+	if _, err := f.state.Accounts().ByID(accountID); err != nil {
 		return ErrAccountDoesNotExist
 	}
 	return f.commit(ctx, &StateTransition{Event: &StateTransition_AccountDeviceUsernameAdded{
@@ -175,7 +180,7 @@ func (f *FSM) AddDeviceUsername(ctx context.Context, accountID string, deviceUse
 	}})
 }
 func (f *FSM) RemoveDeviceUsername(ctx context.Context, accountID string, deviceUsername string) error {
-	if _, err := f.state.AccountByID(accountID); err != nil {
+	if _, err := f.state.Accounts().ByID(accountID); err != nil {
 		return ErrAccountDoesNotExist
 	}
 	return f.commit(ctx, &StateTransition{Event: &StateTransition_AccountDeviceUsernameRemoved{
@@ -186,6 +191,10 @@ func (f *FSM) RemoveDeviceUsername(ctx context.Context, accountID string, device
 	}})
 }
 func (f *FSM) DeleteAccount(ctx context.Context, id string) error {
+	_, err := f.state.Accounts().ByID(id)
+	if err != nil {
+		return err
+	}
 	return f.commit(ctx, &StateTransition{Event: &StateTransition_AccountDeleted{
 		AccountDeleted: &AccountDeleted{
 			ID: id,
@@ -226,7 +235,7 @@ func (f *FSM) ChangeDevicePassword(ctx context.Context, id, owner, password stri
 	}})
 }
 func (f *FSM) CreateDevice(ctx context.Context, owner, name, password string, active bool) (string, error) {
-	if _, err := f.state.AccountByID(owner); err != nil {
+	if _, err := f.state.Accounts().ByID(owner); err != nil {
 		return "", ErrAccountDoesNotExist
 	}
 	id := uuid.New().String()
@@ -242,11 +251,74 @@ func (f *FSM) CreateDevice(ctx context.Context, owner, name, password string, ac
 		},
 	}})
 }
+func (f *FSM) CreateApplication(ctx context.Context, accountID, name string) (string, error) {
+	_, err := f.state.Accounts().ByID(accountID)
+	if err != nil {
+		return "", err
+	}
+	id := uuid.New().String()
+	now := time.Now().UnixNano()
+	return id, f.commit(ctx, &StateTransition{Event: &StateTransition_ApplicationCreated{
+		ApplicationCreated: &ApplicationCreated{
+			ID:        id,
+			AccountID: accountID,
+			Name:      name,
+			CreatedAt: now,
+		},
+	}})
+}
+func (f *FSM) DeleteApplication(ctx context.Context, id string) error {
+	_, err := f.state.Applications().ByID(id)
+	if err != nil {
+		return err
+	}
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_ApplicationDeleted{
+		ApplicationDeleted: &ApplicationDeleted{
+			ID: id,
+		},
+	}})
+}
+func (f *FSM) CreateApplicationProfile(ctx context.Context, applicationID, accountID, name, password string) (string, error) {
 
-func (f *FSM) Shutdown(ctx context.Context) error {
-	return f.commit(ctx, &StateTransition{Event: &StateTransition_PeerLost{
-		PeerLost: &PeerLost{
-			Peer: f.id,
+	if len(password) < 8 {
+		return "", ErrPasswordTooShort
+	}
+
+	id := uuid.New().String()
+	now := time.Now().UnixNano()
+	_, err := f.state.Applications().ByAccountID(applicationID, accountID)
+	if err != nil {
+		return "", err
+	}
+
+	salt, err := generateRandomBytes(256)
+	if err != nil {
+		return "", err
+	}
+	passwordFingerprint := sha256.Sum256(append([]byte(password), salt...))
+
+	return id, f.commit(ctx, &StateTransition{Event: &StateTransition_ApplicationProfileCreated{
+		ApplicationProfileCreated: &ApplicationProfileCreated{
+			ID:                  id,
+			ApplicationID:       applicationID,
+			AccountID:           accountID,
+			Name:                name,
+			CreatedAt:           now,
+			Enabled:             true,
+			PasswordSalt:        salt,
+			PasswordFingerprint: passwordFingerprint[:],
+		},
+	}})
+}
+func (f *FSM) DeleteApplicationProfile(ctx context.Context, id string) error {
+	_, err := f.state.ApplicationProfiles().ByID(id)
+	if err != nil {
+		return err
+	}
+
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_ApplicationProfileDeleted{
+		ApplicationProfileDeleted: &ApplicationProfileDeleted{
+			ID: id,
 		},
 	}})
 }
@@ -260,7 +332,7 @@ func (f *FSM) Apply(index uint64, b []byte) error {
 		switch event := event.GetEvent().(type) {
 		case *StateTransition_AccountCreated:
 			in := event.AccountCreated
-			err = f.state.CreateAccount(&api.Account{
+			err = f.state.Accounts().Create(&api.Account{
 				ID:              in.ID,
 				Name:            in.Name,
 				Principals:      in.Principals,
@@ -268,7 +340,7 @@ func (f *FSM) Apply(index uint64, b []byte) error {
 				CreatedAt:       in.CreatedAt,
 			})
 		case *StateTransition_AccountDeleted:
-			err = f.state.DeleteAccount(event.AccountDeleted.ID)
+			err = f.state.Accounts().Delete(event.AccountDeleted.ID)
 		case *StateTransition_DeviceCreated:
 			in := event.DeviceCreated
 			err = f.state.CreateDevice(&api.Device{
@@ -279,6 +351,30 @@ func (f *FSM) Apply(index uint64, b []byte) error {
 				CreatedAt: in.CreatedAt,
 				Password:  in.Password,
 			})
+		case *StateTransition_ApplicationCreated:
+			in := event.ApplicationCreated
+			err = f.state.Applications().Create(&api.Application{
+				ID:        in.ID,
+				Name:      in.Name,
+				AccountID: in.AccountID,
+			})
+		case *StateTransition_ApplicationDeleted:
+			in := event.ApplicationDeleted
+			err = f.state.Applications().Delete(in.ID)
+		case *StateTransition_ApplicationProfileCreated:
+			in := event.ApplicationProfileCreated
+			err = f.state.ApplicationProfiles().Create(&api.ApplicationProfile{
+				ID:                  in.ID,
+				ApplicationID:       in.ApplicationID,
+				Name:                in.Name,
+				AccountID:           in.AccountID,
+				Enabled:             in.Enabled,
+				PasswordFingerprint: in.PasswordFingerprint,
+				PasswordSalt:        in.PasswordSalt,
+			})
+		case *StateTransition_ApplicationProfileDeleted:
+			in := event.ApplicationProfileDeleted
+			err = f.state.ApplicationProfiles().Delete(in.ID)
 		case *StateTransition_DeviceDeleted:
 			in := event.DeviceDeleted
 			err = f.state.DeleteDevice(in.ID, in.Owner)
@@ -293,10 +389,10 @@ func (f *FSM) Apply(index uint64, b []byte) error {
 			err = f.state.ChangeDevicePassword(in.ID, in.Owner, in.Password)
 		case *StateTransition_AccountDeviceUsernameAdded:
 			in := event.AccountDeviceUsernameAdded
-			err = f.state.AddDeviceUsername(in.ID, in.DeviceUsername)
+			err = f.state.Accounts().AddDeviceUsername(in.ID, in.DeviceUsername)
 		case *StateTransition_AccountDeviceUsernameRemoved:
 			in := event.AccountDeviceUsernameRemoved
-			err = f.state.RemoveDeviceUsername(in.ID, in.DeviceUsername)
+			err = f.state.Accounts().RemoveDeviceUsername(in.ID, in.DeviceUsername)
 		default:
 		}
 		if err != nil {

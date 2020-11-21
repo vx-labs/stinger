@@ -1,4 +1,4 @@
-package vespiary
+package state
 
 import (
 	"encoding/json"
@@ -11,19 +11,40 @@ import (
 )
 
 const (
-	devicesTable  = "devices"
-	accountsTable = "accounts"
+	devicesTable             = "devices"
+	accountsTable            = "accounts"
+	applicationsTable        = "applications"
+	applicationProfilesTable = "applicationProfiles"
 )
 
 var (
 	ErrAccountDoesNotExist = errors.New("account does not exist")
 )
 
-type memDBStore struct {
-	db *memdb.MemDB
+type Store interface {
+	Applications() ApplicationsState
+	ApplicationProfiles() ApplicationProfilesState
+	Accounts() AccountsState
+	DeleteDevice(id, owner string) error
+	CreateDevice(device *api.Device) error
+	EnableDevice(id, owner string) error
+	DisableDevice(id, owner string) error
+	ChangeDevicePassword(id, owner, password string) error
+	DevicesByOwner(owner string) ([]*api.Device, error)
+	DeviceByID(owner, id string) (*api.Device, error)
+	DeviceByName(owner, name string) (*api.Device, error)
+	Dump() ([]byte, error)
+	Load([]byte) error
 }
 
-func NewStateStore() *memDBStore {
+type memDBStore struct {
+	db                  *memdb.MemDB
+	accounts            AccountsState
+	applications        ApplicationsState
+	applicationProfiles ApplicationProfilesState
+}
+
+func newDB() *memdb.MemDB {
 	db, err := memdb.NewMemDB(&memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
 			devicesTable: {
@@ -69,61 +90,39 @@ func NewStateStore() *memDBStore {
 					},
 				},
 			},
-			accountsTable: {
-				Name: accountsTable,
-				Indexes: map[string]*memdb.IndexSchema{
-					"id": {
-						Name: "id",
-						Indexer: &memdb.StringFieldIndex{
-							Field: "ID",
-						},
-						Unique:       true,
-						AllowMissing: false,
-					},
-					"name": {
-						Name: "name",
-						Indexer: &memdb.StringFieldIndex{
-							Field: "Name",
-						},
-						Unique:       true,
-						AllowMissing: false,
-					},
-					"principals": {
-						Name: "principals",
-						Indexer: &memdb.StringSliceFieldIndex{
-							Field: "Principals",
-						},
-
-						Unique:       true,
-						AllowMissing: true,
-					},
-					"deviceUsernames": {
-						Name: "deviceUsernames",
-						Indexer: &memdb.StringSliceFieldIndex{
-							Field: "DeviceUsernames",
-						},
-						Unique:       true,
-						AllowMissing: true,
-					},
-				},
-			},
+			accountsTable:            accountsTableSchema(),
+			applicationsTable:        applicationTableSchema(),
+			applicationProfilesTable: applicationProfilesTableSchema(),
 		},
 	})
 	if err != nil {
 		panic(err)
 	}
-	s := &memDBStore{
-		db: db,
-	}
-	return s
+	return db
 }
 
+func NewStateStore() Store {
+	db := newDB()
+	return &memDBStore{
+		db:                  db,
+		accounts:            newAccountsState(db),
+		applications:        newApplicationsState(db),
+		applicationProfiles: newApplicationProfilesState(db),
+	}
+}
+
+func (s *memDBStore) Accounts() AccountsState {
+	return s.accounts
+}
+func (s *memDBStore) Applications() ApplicationsState {
+	return s.applications
+}
+func (s *memDBStore) ApplicationProfiles() ApplicationProfilesState {
+	return s.applicationProfiles
+}
 func (s *memDBStore) CreateDevice(device *api.Device) error {
 	tx := s.db.Txn(true)
 	defer tx.Abort()
-	if _, err := s.accountByID(tx, device.Owner); err != nil {
-		return ErrAccountDoesNotExist
-	}
 	err := tx.Insert(devicesTable, device)
 	if err != nil {
 		return err
@@ -131,16 +130,7 @@ func (s *memDBStore) CreateDevice(device *api.Device) error {
 	tx.Commit()
 	return nil
 }
-func (s *memDBStore) CreateAccount(account *api.Account) error {
-	tx := s.db.Txn(true)
-	defer tx.Abort()
-	err := tx.Insert(accountsTable, account)
-	if err != nil {
-		return err
-	}
-	tx.Commit()
-	return nil
-}
+
 func (s *memDBStore) DeleteDevice(id, owner string) error {
 	tx := s.db.Txn(true)
 	defer tx.Abort()
@@ -150,26 +140,6 @@ func (s *memDBStore) deleteDevice(tx *memdb.Txn, id, owner string) error {
 	err := tx.Delete(devicesTable, &api.Device{ID: id, Owner: owner})
 	if err != nil {
 		return err
-	}
-	tx.Commit()
-	return nil
-}
-func (s *memDBStore) DeleteAccount(id string) error {
-	tx := s.db.Txn(true)
-	defer tx.Abort()
-	err := tx.Delete(accountsTable, &api.Account{ID: id})
-	if err != nil {
-		return err
-	}
-	devices, err := s.devicesByOwner(tx, id)
-	if err != nil {
-		return err
-	}
-	for _, device := range devices {
-		err := s.deleteDevice(tx, device.ID, device.Owner)
-		if err != nil {
-			return err
-		}
 	}
 	tx.Commit()
 	return nil
@@ -202,86 +172,7 @@ func (s *memDBStore) DeviceByName(owner, name string) (*api.Device, error) {
 	}
 	return elt.(*api.Device), nil
 }
-func (s *memDBStore) AccountByName(name string) (*api.Account, error) {
-	tx := s.db.Txn(false)
-	defer tx.Abort()
-	elt, err := tx.First(accountsTable, "name", name)
-	if err != nil {
-		return nil, err
-	}
-	if elt == nil {
-		return nil, errors.New("not found")
-	}
-	return elt.(*api.Account), nil
-}
-func (s *memDBStore) AccountByPrincipal(principal string) (*api.Account, error) {
-	tx := s.db.Txn(false)
-	defer tx.Abort()
-	elt, err := tx.First(accountsTable, "principals", principal)
-	if err != nil {
-		return nil, err
-	}
-	if elt == nil {
-		return nil, errors.New("not found")
-	}
-	return elt.(*api.Account), nil
-}
-func (s *memDBStore) AccountByDeviceUsername(deviceUsername string) (*api.Account, error) {
-	tx := s.db.Txn(false)
-	defer tx.Abort()
-	elt, err := tx.First(accountsTable, "deviceUsernames", deviceUsername)
-	if err != nil {
-		return nil, err
-	}
-	if elt == nil {
-		return nil, errors.New("not found")
-	}
-	return elt.(*api.Account), nil
-}
-func (s *memDBStore) AddDeviceUsername(accountID string, username string) error {
-	tx := s.db.Txn(true)
-	defer tx.Abort()
-	account, err := s.accountByID(tx, accountID)
-	if err != nil {
-		return ErrAccountDoesNotExist
-	}
-	for idx := range account.DeviceUsernames {
-		if username == account.DeviceUsernames[idx] {
-			return nil
-		}
-	}
-	account.DeviceUsernames = append(account.DeviceUsernames, username)
-	err = tx.Insert(accountsTable, account)
-	if err != nil {
-		return err
-	}
-	tx.Commit()
-	return nil
-}
-func (s *memDBStore) RemoveDeviceUsername(accountID string, username string) error {
-	tx := s.db.Txn(true)
-	defer tx.Abort()
-	account, err := s.accountByID(tx, accountID)
-	if err != nil {
-		return ErrAccountDoesNotExist
-	}
-	newList := make([]string, 0)
-	for idx := range account.DeviceUsernames {
-		if username != account.DeviceUsernames[idx] {
-			newList = append(newList, account.DeviceUsernames[idx])
-		}
-	}
-	if len(newList) == len(account.DeviceUsernames) {
-		return nil
-	}
-	account.DeviceUsernames = newList
-	err = tx.Insert(accountsTable, account)
-	if err != nil {
-		return err
-	}
-	tx.Commit()
-	return nil
-}
+
 func (s *memDBStore) DeviceByID(owner, id string) (*api.Device, error) {
 	tx := s.db.Txn(false)
 	defer tx.Abort()
@@ -294,35 +185,7 @@ func (s *memDBStore) DeviceByID(owner, id string) (*api.Device, error) {
 	}
 	return elt.(*api.Device), nil
 }
-func (s *memDBStore) ListAccounts() ([]*api.Account, error) {
-	tx := s.db.Txn(false)
-	defer tx.Abort()
-	iterator, err := tx.Get(accountsTable, "id")
-	if err != nil {
-		return nil, err
-	}
-	out := []*api.Account{}
-	for elt := iterator.Next(); elt != nil; elt = iterator.Next() {
-		out = append(out, elt.(*api.Account))
-	}
-	return out, nil
-}
 
-func (s *memDBStore) AccountByID(id string) (*api.Account, error) {
-	tx := s.db.Txn(false)
-	defer tx.Abort()
-	return s.accountByID(tx, id)
-}
-func (s *memDBStore) accountByID(tx *memdb.Txn, id string) (*api.Account, error) {
-	elt, err := tx.First(accountsTable, "id", id)
-	if err != nil {
-		return nil, err
-	}
-	if elt == nil {
-		return nil, errors.New("not found")
-	}
-	return elt.(*api.Account), nil
-}
 func (s *memDBStore) EnableDevice(id, owner string) error {
 	tx := s.db.Txn(true)
 	defer tx.Abort()
@@ -389,8 +252,10 @@ func (s *memDBStore) ChangeDevicePassword(id, owner, password string) error {
 }
 
 type Dump struct {
-	Accounts []byte
-	Devices  []byte
+	Accounts            []byte
+	Devices             []byte
+	Applications        []byte
+	ApplicationProfiles []byte
 }
 
 func (s *memDBStore) Dump() ([]byte, error) {
@@ -414,34 +279,35 @@ func (s *memDBStore) Dump() ([]byte, error) {
 		accounts = append(accounts, elt.(*api.Account))
 	}
 	accountsPayload, _ := proto.Marshal(&api.AccountSet{Accounts: accounts})
+
+	iterator, err = tx.Get(applicationsTable, "id")
+	if err != nil {
+		return nil, err
+	}
+	applications := []*api.Application{}
+	for elt := iterator.Next(); elt != nil; elt = iterator.Next() {
+		applications = append(applications, elt.(*api.Application))
+	}
+	applicationsPayload, _ := proto.Marshal(&api.ApplicationSet{Applications: applications})
+
+	iterator, err = tx.Get(applicationProfilesTable, "id")
+	if err != nil {
+		return nil, err
+	}
+	applicationProfiles := []*api.ApplicationProfile{}
+	for elt := iterator.Next(); elt != nil; elt = iterator.Next() {
+		applicationProfiles = append(applicationProfiles, elt.(*api.ApplicationProfile))
+	}
+	applicationProfilesPayload, _ := proto.Marshal(&api.ApplicationProfileSet{ApplicationProfiles: applicationProfiles})
 	return json.Marshal(&Dump{
-		Devices:  devicesPayload,
-		Accounts: accountsPayload,
+		Devices:             devicesPayload,
+		Accounts:            accountsPayload,
+		Applications:        applicationsPayload,
+		ApplicationProfiles: applicationProfilesPayload,
 	})
 }
 
 func (s *memDBStore) Load(buf []byte) error {
-	set := api.DeviceSet{}
-	err := proto.Unmarshal(buf, &set)
-	if err != nil {
-		return s.Loadv2(buf)
-	}
-	tx := s.db.Txn(true)
-	_, err = tx.DeleteAll(devicesTable, "id")
-	if err != nil {
-		return err
-	}
-
-	for _, device := range set.Devices {
-		err := tx.Insert(devicesTable, device)
-		if err != nil {
-			return err
-		}
-	}
-	tx.Commit()
-	return nil
-}
-func (s *memDBStore) Loadv2(buf []byte) error {
 	dump := Dump{}
 	err := json.Unmarshal(buf, &dump)
 	if err != nil {
@@ -456,13 +322,32 @@ func (s *memDBStore) Loadv2(buf []byte) error {
 	if err != nil {
 		return err
 	}
+	_, err = tx.DeleteAll(applicationsTable, "id")
+	if err != nil {
+		return err
+	}
+	_, err = tx.DeleteAll(applicationProfilesTable, "id")
+	if err != nil {
+		return err
+	}
+
 	deviceSet := &api.DeviceSet{}
 	accountSet := &api.AccountSet{}
+	applicationSet := &api.ApplicationSet{}
+	applicationProfileSet := &api.ApplicationProfileSet{}
 	err = proto.Unmarshal(dump.Devices, deviceSet)
 	if err != nil {
 		return err
 	}
 	err = proto.Unmarshal(dump.Accounts, accountSet)
+	if err != nil {
+		return err
+	}
+	err = proto.Unmarshal(dump.Applications, applicationSet)
+	if err != nil {
+		return err
+	}
+	err = proto.Unmarshal(dump.ApplicationProfiles, applicationProfileSet)
 	if err != nil {
 		return err
 	}
@@ -474,6 +359,18 @@ func (s *memDBStore) Loadv2(buf []byte) error {
 	}
 	for _, device := range deviceSet.Devices {
 		err := tx.Insert(devicesTable, device)
+		if err != nil {
+			return err
+		}
+	}
+	for _, application := range applicationSet.Applications {
+		err := tx.Insert(applicationsTable, application)
+		if err != nil {
+			return err
+		}
+	}
+	for _, applicationProfile := range applicationProfileSet.ApplicationProfiles {
+		err := tx.Insert(applicationProfilesTable, applicationProfile)
 		if err != nil {
 			return err
 		}
