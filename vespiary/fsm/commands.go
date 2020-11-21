@@ -22,6 +22,7 @@ var (
 	ErrAccountDoesNotExist  = errors.New("account does not exist")
 	ErrAccountAlreadyExists = errors.New("account already exists")
 	ErrPasswordTooShort     = errors.New("password too short")
+	ErrInvalidName          = errors.New("invalid name")
 )
 
 func decode(payload []byte) ([]*StateTransition, error) {
@@ -252,6 +253,9 @@ func (f *FSM) CreateDevice(ctx context.Context, owner, name, password string, ac
 	}})
 }
 func (f *FSM) CreateApplication(ctx context.Context, accountID, name string) (string, error) {
+	if len(name) == 0 {
+		return "", errors.New("application must have a name")
+	}
 	_, err := f.state.Accounts().ByID(accountID)
 	if err != nil {
 		return "", err
@@ -279,7 +283,9 @@ func (f *FSM) DeleteApplication(ctx context.Context, id string) error {
 	}})
 }
 func (f *FSM) CreateApplicationProfile(ctx context.Context, applicationID, accountID, name, password string) (string, error) {
-
+	if len(name) == 0 {
+		return "", errors.New("application profile must have a name")
+	}
 	if len(password) < 8 {
 		return "", ErrPasswordTooShort
 	}
