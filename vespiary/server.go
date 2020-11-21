@@ -275,6 +275,13 @@ func (s *server) ListApplicationProfilesByAccountID(ctx context.Context, input *
 	}
 	return &api.ListApplicationProfilesByAccountIDResponse{ApplicationProfiles: out}, nil
 }
+func (s *server) ListApplicationProfilesByApplication(ctx context.Context, input *api.ListApplicationProfilesByApplicationRequest) (*api.ListApplicationProfilesByApplicationResponse, error) {
+	out, err := s.state.ApplicationProfiles().ListByApplicationIDAndAccountID(input.ApplicationID, input.AccountID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.ListApplicationProfilesByApplicationResponse{ApplicationProfiles: out}, nil
+}
 
 func (s *server) DeleteApplicationProfile(ctx context.Context, input *api.DeleteApplicationProfileRequest) (*api.DeleteApplicationProfileResponse, error) {
 	err := s.fsm.DeleteApplicationProfile(ctx, input.ID)
