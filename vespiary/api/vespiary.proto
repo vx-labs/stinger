@@ -143,6 +143,18 @@ message ListApplicationsByAccountIDRequest { string AccountID = 1; };
 message ListApplicationsByAccountIDResponse {
   repeated Application Applications = 1;
 };
+message GetApplicationRequest { string id = 1; };
+message GetApplicationResponse { Application Application = 1; };
+message GetApplicationByAccountIDRequest {
+  string id = 1;
+  string AccountID = 2;
+};
+message GetApplicationByAccountIDResponse { Application Application = 1; };
+message GetApplicationByNameRequest {
+  string Name = 1;
+  string AccountID = 2;
+};
+message GetApplicationByNameResponse { Application Application = 1; };
 
 service Vespiary {
   rpc CreateApplication(CreateApplicationRequest)
@@ -156,6 +168,11 @@ service Vespiary {
 
   rpc CreateApplicationProfile(CreateApplicationProfileRequest)
       returns (CreateApplicationProfileResponse);
+  rpc GetApplication(GetApplicationRequest) returns (GetApplicationResponse);
+  rpc GetApplicationByAccountID(GetApplicationByAccountIDRequest)
+      returns (GetApplicationByAccountIDResponse);
+  rpc GetApplicationByName(GetApplicationByNameRequest)
+      returns (GetApplicationByNameResponse);
   rpc ListApplicationProfiles(ListApplicationProfilesRequest)
       returns (ListApplicationProfilesResponse);
   rpc ListApplicationProfilesByAccountID(

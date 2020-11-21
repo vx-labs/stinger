@@ -224,6 +224,27 @@ func (s *server) ListApplications(ctx context.Context, input *api.ListApplicatio
 	}
 	return &api.ListApplicationsResponse{Applications: out}, nil
 }
+func (s *server) GetApplication(ctx context.Context, input *api.GetApplicationRequest) (*api.GetApplicationResponse, error) {
+	out, err := s.state.Applications().ByID(input.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &api.GetApplicationResponse{Application: out}, nil
+}
+func (s *server) GetApplicationByAccountID(ctx context.Context, input *api.GetApplicationByAccountIDRequest) (*api.GetApplicationByAccountIDResponse, error) {
+	out, err := s.state.Applications().ByAccountID(input.Id, input.AccountID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.GetApplicationByAccountIDResponse{Application: out}, nil
+}
+func (s *server) GetApplicationByName(ctx context.Context, input *api.GetApplicationByNameRequest) (*api.GetApplicationByNameResponse, error) {
+	out, err := s.state.Applications().ByNameAndAccountID(input.Name, input.AccountID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.GetApplicationByNameResponse{Application: out}, nil
+}
 func (s *server) ListApplicationsByAccountID(ctx context.Context, input *api.ListApplicationsByAccountIDRequest) (*api.ListApplicationsByAccountIDResponse, error) {
 	out, err := s.state.Applications().ListByAccountID(input.AccountID)
 	if err != nil {
