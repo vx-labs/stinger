@@ -13,8 +13,14 @@ message AccountCreated {
   int64 CreatedAt = 5;
 }
 message AccountDeleted { string ID = 1; }
-message AccountDeviceUsernameAdded { string ID = 1; string DeviceUsername = 2; }
-message AccountDeviceUsernameRemoved { string ID = 1; string DeviceUsername = 2; }
+message AccountDeviceUsernameAdded {
+  string ID = 1;
+  string DeviceUsername = 2;
+}
+message AccountDeviceUsernameRemoved {
+  string ID = 1;
+  string DeviceUsername = 2;
+}
 
 message DeviceCreated {
   string ID = 1;
@@ -41,6 +47,21 @@ message DevicePasswordChanged {
   string Owner = 2;
   string Password = 3;
 }
+message ApplicationCreated {
+  string ID = 1;
+  string AccountID = 2;
+  string Name = 3;
+  int64 CreatedAt = 4;
+}
+message ApplicationDeleted { string ID = 1; }
+message ApplicationProfileCreated {
+  string ID = 1;
+  string ApplicationID = 2;
+  string AccountID = 3;
+  string Name = 4;
+  int64 CreatedAt = 5;
+}
+message ApplicationProfileDeleted { string ID = 1; }
 
 message StateTransition {
   oneof Event {
@@ -54,5 +75,9 @@ message StateTransition {
     AccountDeleted AccountDeleted = 8;
     AccountDeviceUsernameAdded AccountDeviceUsernameAdded = 9;
     AccountDeviceUsernameRemoved AccountDeviceUsernameRemoved = 10;
+    ApplicationCreated ApplicationCreated = 11;
+    ApplicationDeleted ApplicationDeleted = 12;
+    ApplicationProfileCreated ApplicationProfileCreated = 13;
+    ApplicationProfileDeleted ApplicationProfileDeleted = 14;
   }
 }

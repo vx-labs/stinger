@@ -13,24 +13,12 @@ import (
 	"github.com/vx-labs/cluster/raft"
 	"github.com/vx-labs/vespiary/vespiary/api"
 	"github.com/vx-labs/vespiary/vespiary/audit"
+	"github.com/vx-labs/vespiary/vespiary/state"
 )
 
 var (
 	ErrAccountDoesNotExist = errors.New("account does not exist")
 )
-
-type State interface {
-	DeleteDevice(id, owner string) error
-	CreateDevice(device *api.Device) error
-	EnableDevice(id, owner string) error
-	DisableDevice(id, owner string) error
-	ChangeDevicePassword(id, owner, password string) error
-	CreateAccount(account *api.Account) error
-	DeleteAccount(id string) error
-	AccountByID(id string) (*api.Account, error)
-	AddDeviceUsername(account string, username string) error
-	RemoveDeviceUsername(account string, username string) error
-}
 
 func decode(payload []byte) ([]*StateTransition, error) {
 	format := StateTransitionSet{}
@@ -47,13 +35,13 @@ func encode(events ...*StateTransition) ([]byte, error) {
 	return proto.Marshal(&format)
 }
 
-func NewFSM(id uint64, state State, commandsCh chan raft.Command, recorder audit.Recorder) *FSM {
+func NewFSM(id uint64, state state.Store, commandsCh chan raft.Command, recorder audit.Recorder) *FSM {
 	return &FSM{id: id, state: state, commandsCh: commandsCh, recorder: recorder}
 }
 
 type FSM struct {
 	id         uint64
-	state      State
+	state      state.Store
 	commandsCh chan raft.Command
 	recorder   audit.Recorder
 }
@@ -239,6 +227,45 @@ func (f *FSM) CreateDevice(ctx context.Context, owner, name, password string, ac
 			CreatedAt: now,
 			Password:  password,
 			Active:    active,
+		},
+	}})
+}
+func (f *FSM) CreateApplication(ctx context.Context, accountID, name string) (string, error) {
+	id := uuid.New().String()
+	now := time.Now().UnixNano()
+	return id, f.commit(ctx, &StateTransition{Event: &StateTransition_ApplicationCreated{
+		ApplicationCreated: &ApplicationCreated{
+			ID:        id,
+			AccountID: accountID,
+			Name:      name,
+			CreatedAt: now,
+		},
+	}})
+}
+func (f *FSM) DeleteApplication(ctx context.Context, id string) error {
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_ApplicationDeleted{
+		ApplicationDeleted: &ApplicationDeleted{
+			ID: id,
+		},
+	}})
+}
+func (f *FSM) CreateApplicationProfile(ctx context.Context, applicationID, accountID, name string) (string, error) {
+	id := uuid.New().String()
+	now := time.Now().UnixNano()
+	return id, f.commit(ctx, &StateTransition{Event: &StateTransition_ApplicationProfileCreated{
+		ApplicationProfileCreated: &ApplicationProfileCreated{
+			ID:            id,
+			ApplicationID: applicationID,
+			AccountID:     accountID,
+			Name:          name,
+			CreatedAt:     now,
+		},
+	}})
+}
+func (f *FSM) DeleteApplicationProfile(ctx context.Context, id string) error {
+	return f.commit(ctx, &StateTransition{Event: &StateTransition_ApplicationProfileDeleted{
+		ApplicationProfileDeleted: &ApplicationProfileDeleted{
+			ID: id,
 		},
 	}})
 }

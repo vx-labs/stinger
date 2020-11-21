@@ -19,6 +19,10 @@ type FSM interface {
 	DeleteAccount(ctx context.Context, id string) error
 	AddDeviceUsername(ctx context.Context, accountID string, deviceUsername string) error
 	RemoveDeviceUsername(ctx context.Context, accountID string, deviceUsername string) error
+	CreateApplication(ctx context.Context, accountID, name string) (string, error)
+	DeleteApplication(ctx context.Context, id string) error
+	CreateApplicationProfile(ctx context.Context, applicationID, accountID, name string) (string, error)
+	DeleteApplicationProfile(ctx context.Context, id string) error
 }
 
 type State interface {
@@ -205,4 +209,37 @@ func (s *server) RemoveAccountDeviceUsername(ctx context.Context, input *api.Rem
 	}
 	return &api.RemoveAccountDeviceUsernameResponse{}, nil
 
+}
+
+func (s *server) CreateApplication(ctx context.Context, input *api.CreateApplicationRequest) (*api.CreateApplicationResponse, error) {
+	id, err := s.fsm.CreateApplication(ctx, input.AccountID, input.Name)
+	if err != nil {
+		return nil, err
+	}
+	return &api.CreateApplicationResponse{
+		ID: id,
+	}, nil
+}
+func (s *server) DeleteApplication(ctx context.Context, input *api.DeleteApplicationRequest) (*api.DeleteApplicationResponse, error) {
+	err := s.fsm.DeleteApplication(ctx, input.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.DeleteApplicationResponse{}, nil
+}
+func (s *server) CreateApplicationProfile(ctx context.Context, input *api.CreateApplicationProfileRequest) (*api.CreateApplicationProfileResponse, error) {
+	id, err := s.fsm.CreateApplication(ctx, input.AccountID, input.Name)
+	if err != nil {
+		return nil, err
+	}
+	return &api.CreateApplicationProfileResponse{
+		ID: id,
+	}, nil
+}
+func (s *server) DeleteApplicationProfile(ctx context.Context, input *api.DeleteApplicationProfileRequest) (*api.DeleteApplicationProfileResponse, error) {
+	err := s.fsm.DeleteApplicationProfile(ctx, input.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.DeleteApplicationProfileResponse{}, nil
 }

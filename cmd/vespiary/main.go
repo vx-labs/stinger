@@ -20,6 +20,7 @@ import (
 	"github.com/vx-labs/cluster/raft"
 	"github.com/vx-labs/vespiary/vespiary"
 	"github.com/vx-labs/vespiary/vespiary/fsm"
+	"github.com/vx-labs/vespiary/vespiary/state"
 	"github.com/vx-labs/wasp/v4/async"
 	"go.etcd.io/etcd/etcdserver/api/snap"
 
@@ -130,7 +131,7 @@ func main() {
 			healthServer.SetServingStatus("node", healthpb.HealthCheckResponse_SERVING)
 			healthServer.SetServingStatus("rpc", healthpb.HealthCheckResponse_NOT_SERVING)
 
-			stateStore := vespiary.NewStateStore()
+			stateStore := state.NewStateStore()
 			healthServer.Resume()
 			operations := async.NewOperations(ctx, vespiary.L(ctx))
 			cancelCh := make(chan struct{})

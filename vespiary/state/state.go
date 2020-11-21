@@ -1,4 +1,4 @@
-package vespiary
+package state
 
 import (
 	"encoding/json"
@@ -11,19 +11,47 @@ import (
 )
 
 const (
-	devicesTable  = "devices"
-	accountsTable = "accounts"
+	devicesTable             = "devices"
+	accountsTable            = "accounts"
+	applicationsTable        = "applications"
+	applicationProfilesTable = "applicationProfiles"
 )
 
 var (
 	ErrAccountDoesNotExist = errors.New("account does not exist")
 )
 
-type memDBStore struct {
-	db *memdb.MemDB
+type Store interface {
+	Applications() ApplicationsState
+	ApplicationProfiles() ApplicationProfilesState
+	DeleteDevice(id, owner string) error
+	CreateDevice(device *api.Device) error
+	EnableDevice(id, owner string) error
+	DisableDevice(id, owner string) error
+	ChangeDevicePassword(id, owner, password string) error
+	CreateAccount(account *api.Account) error
+	DeleteAccount(id string) error
+	AccountByID(id string) (*api.Account, error)
+	AccountByDeviceUsername(deviceUsername string) (*api.Account, error)
+	AddDeviceUsername(account string, username string) error
+	AccountByPrincipal(principal string) (*api.Account, error)
+	AccountByName(name string) (*api.Account, error)
+	ListAccounts() ([]*api.Account, error)
+	RemoveDeviceUsername(account string, username string) error
+	DevicesByOwner(owner string) ([]*api.Device, error)
+	DeviceByID(owner, id string) (*api.Device, error)
+	DeviceByName(owner, name string) (*api.Device, error)
+	Dump() ([]byte, error)
+	Load([]byte) error
 }
 
-func NewStateStore() *memDBStore {
+type memDBStore struct {
+	db                  *memdb.MemDB
+	applications        ApplicationsState
+	applicationProfiles ApplicationProfilesState
+}
+
+func newDB() *memdb.MemDB {
 	db, err := memdb.NewMemDB(&memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
 			devicesTable: {
@@ -107,17 +135,31 @@ func NewStateStore() *memDBStore {
 					},
 				},
 			},
+			applicationsTable:        applicationTableSchema(),
+			applicationProfilesTable: applicationProfilesTableSchema(),
 		},
 	})
 	if err != nil {
 		panic(err)
 	}
-	s := &memDBStore{
-		db: db,
-	}
-	return s
+	return db
 }
 
+func NewStateStore() Store {
+	db := newDB()
+	return &memDBStore{
+		db:                  db,
+		applications:        newApplicationsState(db),
+		applicationProfiles: newApplicationProfilesState(db),
+	}
+}
+
+func (s *memDBStore) Applications() ApplicationsState {
+	return s.applications
+}
+func (s *memDBStore) ApplicationProfiles() ApplicationProfilesState {
+	return s.applicationProfiles
+}
 func (s *memDBStore) CreateDevice(device *api.Device) error {
 	tx := s.db.Txn(true)
 	defer tx.Abort()
@@ -141,6 +183,7 @@ func (s *memDBStore) CreateAccount(account *api.Account) error {
 	tx.Commit()
 	return nil
 }
+
 func (s *memDBStore) DeleteDevice(id, owner string) error {
 	tx := s.db.Txn(true)
 	defer tx.Abort()
@@ -171,6 +214,16 @@ func (s *memDBStore) DeleteAccount(id string) error {
 			return err
 		}
 	}
+	_, err = tx.DeleteAll(applicationProfilesTable, "account_id", id)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.DeleteAll(applicationsTable, "account_id", id)
+	if err != nil {
+		return err
+	}
+
 	tx.Commit()
 	return nil
 }

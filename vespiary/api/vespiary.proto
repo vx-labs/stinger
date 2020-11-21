@@ -21,6 +21,22 @@ message Device {
   string Password = 6;
 }
 
+message Application {
+  string ID = 1;
+  string AccountID = 2;
+  string Name = 3;
+}
+message ApplicationSet { repeated Application Applications = 1; }
+message ApplicationProfile {
+  string ID = 1;
+  string AccountID = 2;
+  string ApplicationID = 3;
+  string Name = 4;
+}
+message ApplicationProfileSet {
+  repeated ApplicationProfile ApplicationProfiles = 1;
+}
+
 message CreateDeviceRequest {
   string Owner = 1;
   string Name = 2;
@@ -92,7 +108,34 @@ message RemoveAccountDeviceUsernameRequest {
 }
 message RemoveAccountDeviceUsernameResponse {}
 
+message CreateApplicationRequest {
+  string AccountID = 1;
+  string Name = 2;
+  int64 CreatedAt = 3;
+}
+message CreateApplicationResponse { string ID = 1; }
+message DeleteApplicationRequest { string ID = 1; }
+message DeleteApplicationResponse {}
+
+message CreateApplicationProfileRequest {
+  string AccountID = 1;
+  string ApplicationID = 2;
+  string Name = 3;
+  int64 CreatedAt = 4;
+}
+message CreateApplicationProfileResponse { string ID = 1; }
+message DeleteApplicationProfileRequest { string ID = 1; }
+message DeleteApplicationProfileResponse {}
+
 service Vespiary {
+  rpc CreateApplication(CreateApplicationRequest)
+      returns (CreateApplicationResponse);
+  rpc DeleteApplication(DeleteApplicationRequest)
+      returns (DeleteApplicationResponse);
+  rpc CreateApplicationProfile(CreateApplicationProfileRequest)
+      returns (CreateApplicationProfileResponse);
+  rpc DeleteApplicationProfile(DeleteApplicationProfileRequest)
+      returns (DeleteApplicationProfileResponse);
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
   rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse);
   rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse);
