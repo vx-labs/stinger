@@ -254,12 +254,6 @@ func main() {
 			case <-cancelCh:
 			}
 			vespiary.L(ctx).Info("vespiary shutdown initiated")
-			err = stateMachine.Shutdown(ctx)
-			if err != nil {
-				vespiary.L(ctx).Error("failed to stop state machine", zap.Error(err))
-			} else {
-				vespiary.L(ctx).Debug("state machine stopped")
-			}
 			err = clusterNode.Shutdown()
 			if err != nil {
 				vespiary.L(ctx).Error("failed to leave cluster", zap.Error(err))

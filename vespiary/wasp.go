@@ -1,10 +1,13 @@
 package vespiary
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"strings"
 
+	"github.com/google/uuid"
 	"github.com/vx-labs/vespiary/vespiary/state"
 	"github.com/vx-labs/wasp/v4/wasp/auth"
 	"google.golang.org/grpc"
@@ -40,6 +43,28 @@ func (s *WaspAuthenticationServer) Serve(grpcServer *grpc.Server) {
 }
 
 func (s *WaspAuthenticationServer) AuthenticateMQTTClient(ctx context.Context, input *auth.WaspAuthenticationRequest) (*auth.WaspAuthenticationResponse, error) {
+	tokens := strings.SplitN(string(input.MQTT.Username), "/", 3)
+	if len(tokens) == 3 {
+		account, err := s.state.Accounts().ByName(string(tokens[0]))
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, "invalid username or password")
+		}
+		application, err := s.state.Applications().ByNameAndAccountID(tokens[1], account.ID)
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, "invalid username or password")
+		}
+		profile, err := s.state.ApplicationProfiles().ByNameAndApplicationID(tokens[2], application.ID)
+
+		candidatePassword := sha256.Sum256(append(input.MQTT.Password, profile.PasswordSalt...))
+
+		if bytes.Equal(candidatePassword[:], profile.PasswordFingerprint) {
+			return &auth.WaspAuthenticationResponse{
+				ID:         fmt.Sprintf("%s/%s/%s", application.Name, profile.Name, uuid.New().String()),
+				MountPoint: fmt.Sprintf("%s/%s", account.ID, application.ID),
+			}, nil
+		}
+		return nil, status.Error(codes.InvalidArgument, "invalid username or password")
+	}
 	account, err := s.state.Accounts().ByDeviceUsername(string(input.MQTT.Username))
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid username or password")

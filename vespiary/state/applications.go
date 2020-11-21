@@ -14,7 +14,9 @@ var (
 type ApplicationsState interface {
 	Create(application *api.Application) error
 	ByID(id string) (*api.Application, error)
+	ByNameAndAccountID(name, accountID string) (*api.Application, error)
 	ByAccountID(id, accountID string) (*api.Application, error)
+	All() ([]*api.Application, error)
 	ListByAccountID(accountID string) ([]*api.Application, error)
 	Delete(id string) error
 }
@@ -27,14 +29,6 @@ func applicationTableSchema() *memdb.TableSchema {
 				Name: "id",
 				Indexer: &memdb.StringFieldIndex{
 					Field: "ID",
-				},
-				Unique:       true,
-				AllowMissing: false,
-			},
-			"name": {
-				Name: "name",
-				Indexer: &memdb.StringFieldIndex{
-					Field: "Name",
 				},
 				Unique:       true,
 				AllowMissing: false,
@@ -53,6 +47,21 @@ func applicationTableSchema() *memdb.TableSchema {
 					Indexes: []memdb.Indexer{
 						&memdb.StringFieldIndex{
 							Field: "ID",
+						},
+						&memdb.StringFieldIndex{
+							Field: "AccountID",
+						},
+					},
+				},
+				Unique:       true,
+				AllowMissing: false,
+			},
+			"name_and_account_id": {
+				Name: "name_and_account_id",
+				Indexer: &memdb.CompoundIndex{
+					Indexes: []memdb.Indexer{
+						&memdb.StringFieldIndex{
+							Field: "Name",
 						},
 						&memdb.StringFieldIndex{
 							Field: "AccountID",
@@ -98,6 +107,18 @@ func (s *applicationState) ByID(id string) (*api.Application, error) {
 	}
 	return v.(*api.Application), nil
 }
+func (s *applicationState) ByNameAndAccountID(name, accountID string) (*api.Application, error) {
+	tx := s.db.Txn(false)
+	defer tx.Abort()
+	v, err := tx.First(s.tableName(), "name_and_account_id", name, accountID)
+	if err != nil {
+		return nil, err
+	}
+	if v == nil {
+		return nil, ErrApplicationNotFound
+	}
+	return v.(*api.Application), nil
+}
 func (s *applicationState) ByAccountID(id, accountID string) (*api.Application, error) {
 	tx := s.db.Txn(false)
 	defer tx.Abort()
@@ -110,14 +131,7 @@ func (s *applicationState) ByAccountID(id, accountID string) (*api.Application, 
 	}
 	return v.(*api.Application), nil
 }
-
-func (s *applicationState) ListByAccountID(accountID string) ([]*api.Application, error) {
-	tx := s.db.Txn(false)
-	defer tx.Abort()
-	iterator, err := tx.Get(s.tableName(), "account_id", accountID)
-	if err != nil {
-		return nil, err
-	}
+func (s *applicationState) consumeIterator(iterator memdb.ResultIterator) ([]*api.Application, error) {
 	out := make([]*api.Application, 0)
 	for {
 		v := iterator.Next()
@@ -127,6 +141,26 @@ func (s *applicationState) ListByAccountID(accountID string) ([]*api.Application
 		out = append(out, v.(*api.Application))
 	}
 	return out, nil
+}
+
+func (s *applicationState) ListByAccountID(accountID string) ([]*api.Application, error) {
+	tx := s.db.Txn(false)
+	defer tx.Abort()
+	iterator, err := tx.Get(s.tableName(), "account_id", accountID)
+	if err != nil {
+		return nil, err
+	}
+	return s.consumeIterator(iterator)
+}
+
+func (s *applicationState) All() ([]*api.Application, error) {
+	tx := s.db.Txn(false)
+	defer tx.Abort()
+	iterator, err := tx.Get(s.tableName(), "id")
+	if err != nil {
+		return nil, err
+	}
+	return s.consumeIterator(iterator)
 }
 
 func (s *applicationState) delete(tx *memdb.Txn, id string) error {

@@ -252,8 +252,10 @@ func (s *memDBStore) ChangeDevicePassword(id, owner, password string) error {
 }
 
 type Dump struct {
-	Accounts []byte
-	Devices  []byte
+	Accounts            []byte
+	Devices             []byte
+	Applications        []byte
+	ApplicationProfiles []byte
 }
 
 func (s *memDBStore) Dump() ([]byte, error) {
@@ -277,34 +279,35 @@ func (s *memDBStore) Dump() ([]byte, error) {
 		accounts = append(accounts, elt.(*api.Account))
 	}
 	accountsPayload, _ := proto.Marshal(&api.AccountSet{Accounts: accounts})
+
+	iterator, err = tx.Get(applicationsTable, "id")
+	if err != nil {
+		return nil, err
+	}
+	applications := []*api.Application{}
+	for elt := iterator.Next(); elt != nil; elt = iterator.Next() {
+		applications = append(applications, elt.(*api.Application))
+	}
+	applicationsPayload, _ := proto.Marshal(&api.ApplicationSet{Applications: applications})
+
+	iterator, err = tx.Get(applicationProfilesTable, "id")
+	if err != nil {
+		return nil, err
+	}
+	applicationProfiles := []*api.ApplicationProfile{}
+	for elt := iterator.Next(); elt != nil; elt = iterator.Next() {
+		applicationProfiles = append(applicationProfiles, elt.(*api.ApplicationProfile))
+	}
+	applicationProfilesPayload, _ := proto.Marshal(&api.ApplicationProfileSet{ApplicationProfiles: applicationProfiles})
 	return json.Marshal(&Dump{
-		Devices:  devicesPayload,
-		Accounts: accountsPayload,
+		Devices:             devicesPayload,
+		Accounts:            accountsPayload,
+		Applications:        applicationsPayload,
+		ApplicationProfiles: applicationProfilesPayload,
 	})
 }
 
 func (s *memDBStore) Load(buf []byte) error {
-	set := api.DeviceSet{}
-	err := proto.Unmarshal(buf, &set)
-	if err != nil {
-		return s.Loadv2(buf)
-	}
-	tx := s.db.Txn(true)
-	_, err = tx.DeleteAll(devicesTable, "id")
-	if err != nil {
-		return err
-	}
-
-	for _, device := range set.Devices {
-		err := tx.Insert(devicesTable, device)
-		if err != nil {
-			return err
-		}
-	}
-	tx.Commit()
-	return nil
-}
-func (s *memDBStore) Loadv2(buf []byte) error {
 	dump := Dump{}
 	err := json.Unmarshal(buf, &dump)
 	if err != nil {
@@ -319,13 +322,32 @@ func (s *memDBStore) Loadv2(buf []byte) error {
 	if err != nil {
 		return err
 	}
+	_, err = tx.DeleteAll(applicationsTable, "id")
+	if err != nil {
+		return err
+	}
+	_, err = tx.DeleteAll(applicationProfilesTable, "id")
+	if err != nil {
+		return err
+	}
+
 	deviceSet := &api.DeviceSet{}
 	accountSet := &api.AccountSet{}
+	applicationSet := &api.ApplicationSet{}
+	applicationProfileSet := &api.ApplicationProfileSet{}
 	err = proto.Unmarshal(dump.Devices, deviceSet)
 	if err != nil {
 		return err
 	}
 	err = proto.Unmarshal(dump.Accounts, accountSet)
+	if err != nil {
+		return err
+	}
+	err = proto.Unmarshal(dump.Applications, applicationSet)
+	if err != nil {
+		return err
+	}
+	err = proto.Unmarshal(dump.ApplicationProfiles, applicationProfileSet)
 	if err != nil {
 		return err
 	}
@@ -337,6 +359,18 @@ func (s *memDBStore) Loadv2(buf []byte) error {
 	}
 	for _, device := range deviceSet.Devices {
 		err := tx.Insert(devicesTable, device)
+		if err != nil {
+			return err
+		}
+	}
+	for _, application := range applicationSet.Applications {
+		err := tx.Insert(applicationsTable, application)
+		if err != nil {
+			return err
+		}
+	}
+	for _, applicationProfile := range applicationProfileSet.ApplicationProfiles {
+		err := tx.Insert(applicationProfilesTable, applicationProfile)
 		if err != nil {
 			return err
 		}

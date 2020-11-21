@@ -3,8 +3,6 @@ package fsm;
 
 message StateTransitionSet { repeated StateTransition events = 1; }
 
-message PeerLost { uint64 Peer = 1; }
-
 message AccountCreated {
   string ID = 1; // uuid
   string Name = 2;
@@ -60,12 +58,14 @@ message ApplicationProfileCreated {
   string AccountID = 3;
   string Name = 4;
   int64 CreatedAt = 5;
+  bool Enabled = 6;
+  bytes PasswordFingerprint = 7;
+  bytes PasswordSalt = 8;
 }
 message ApplicationProfileDeleted { string ID = 1; }
 
 message StateTransition {
   oneof Event {
-    PeerLost PeerLost = 1;
     DeviceCreated DeviceCreated = 2;
     DeviceDeleted DeviceDeleted = 3;
     DeviceEnabled DeviceEnabled = 4;

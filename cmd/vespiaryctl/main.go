@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	cluster "github.com/vx-labs/cluster/clusterpb"
+	"github.com/vx-labs/wasp/v4/wasp/auth"
 	"go.uber.org/zap"
 )
 
@@ -72,8 +73,38 @@ func main() {
 
 	hostname, _ := os.Hostname()
 
+	authenticate := (&cobra.Command{
+		Use:     "test-authentication",
+		Aliases: []string{"test", "test-auth"},
+		Run: func(cmd *cobra.Command, args []string) {
+			conn, l := mustDial(ctx, cmd, config)
+			resp, err := auth.NewAuthenticationClient(conn).AuthenticateMQTTClient(ctx, &auth.WaspAuthenticationRequest{
+				MQTT: &auth.ApplicationContext{
+					ClientID: []byte(config.GetString("client-id")),
+					Username: []byte(config.GetString("username")),
+					Password: []byte(config.GetString("password")),
+				},
+				Transport: &auth.TransportContext{
+					Encrypted: config.GetBool("encrypted"),
+				},
+			})
+			if err != nil {
+				l.Fatal("authentication failed", zap.Error(err))
+			}
+			fmt.Printf("authentication succeeded: session_id=%s, tenant=%s\n", resp.ID, resp.MountPoint)
+		},
+	})
+	authenticate.Flags().StringP("client-id", "i", "", "MQTT Client-ID")
+	authenticate.Flags().StringP("username", "u", "", "MQTT Username")
+	authenticate.Flags().StringP("password", "p", "", "MQTT Password")
+	authenticate.Flags().BoolP("encrypted", "e", false, "Flag transport as Encrypted")
+
+	rootCmd.AddCommand(authenticate)
+
 	rootCmd.AddCommand(raft)
 	rootCmd.AddCommand(Devices(ctx, config))
+	rootCmd.AddCommand(Applications(ctx, config))
+	rootCmd.AddCommand(ApplicationProfiles(ctx, config))
 	rootCmd.AddCommand(Accounts(ctx, config))
 	rootCmd.PersistentFlags().BoolP("insecure", "k", false, "Disable GRPC client-side TLS validation.")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Increase log verbosity.")

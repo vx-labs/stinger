@@ -15,9 +15,12 @@ type ApplicationProfilesState interface {
 	Create(application *api.ApplicationProfile) error
 	ByID(id string) (*api.ApplicationProfile, error)
 	ByAccountID(id, accountID string) (*api.ApplicationProfile, error)
+	ByNameAndAccountID(name, accountID string) (*api.ApplicationProfile, error)
+	ByNameAndApplicationID(name, applicationID string) (*api.ApplicationProfile, error)
 	ListByAccountID(accountID string) ([]*api.ApplicationProfile, error)
 	ListByApplicationID(applicationID string) ([]*api.ApplicationProfile, error)
 	ListByApplicationIDAndAccountID(applicationID, accountID string) ([]*api.ApplicationProfile, error)
+	All() ([]*api.ApplicationProfile, error)
 	Delete(id string) error
 }
 
@@ -68,6 +71,36 @@ func applicationProfilesTableSchema() *memdb.TableSchema {
 						},
 						&memdb.StringFieldIndex{
 							Field: "AccountID",
+						},
+					},
+				},
+				Unique:       true,
+				AllowMissing: false,
+			},
+			"name_and_account_id": {
+				Name: "name_and_account_id",
+				Indexer: &memdb.CompoundIndex{
+					Indexes: []memdb.Indexer{
+						&memdb.StringFieldIndex{
+							Field: "Name",
+						},
+						&memdb.StringFieldIndex{
+							Field: "AccountID",
+						},
+					},
+				},
+				Unique:       true,
+				AllowMissing: false,
+			},
+			"name_and_application_id": {
+				Name: "name_and_application_id",
+				Indexer: &memdb.CompoundIndex{
+					Indexes: []memdb.Indexer{
+						&memdb.StringFieldIndex{
+							Field: "Name",
+						},
+						&memdb.StringFieldIndex{
+							Field: "ApplicationID",
 						},
 					},
 				},
@@ -153,6 +186,30 @@ func (s *applicationProfileState) ByAccountID(id, accountID string) (*api.Applic
 	}
 	return v.(*api.ApplicationProfile), nil
 }
+func (s *applicationProfileState) ByNameAndAccountID(name, accountID string) (*api.ApplicationProfile, error) {
+	tx := s.db.Txn(false)
+	defer tx.Abort()
+	v, err := tx.First(s.tableName(), "name_and_account_id", name, accountID)
+	if err != nil {
+		return nil, err
+	}
+	if v == nil {
+		return nil, ErrApplicationProfileNotFound
+	}
+	return v.(*api.ApplicationProfile), nil
+}
+func (s *applicationProfileState) ByNameAndApplicationID(name, applicationID string) (*api.ApplicationProfile, error) {
+	tx := s.db.Txn(false)
+	defer tx.Abort()
+	v, err := tx.First(s.tableName(), "name_and_application_id", name, applicationID)
+	if err != nil {
+		return nil, err
+	}
+	if v == nil {
+		return nil, ErrApplicationProfileNotFound
+	}
+	return v.(*api.ApplicationProfile), nil
+}
 func (s *applicationProfileState) consumeIterator(iterator memdb.ResultIterator) ([]*api.ApplicationProfile, error) {
 	out := make([]*api.ApplicationProfile, 0)
 	for {
@@ -186,6 +243,16 @@ func (s *applicationProfileState) ListByApplicationIDAndAccountID(applicationID,
 	tx := s.db.Txn(false)
 	defer tx.Abort()
 	iterator, err := tx.Get(s.tableName(), "application_id_and_account_id", applicationID, accountID)
+	if err != nil {
+		return nil, err
+	}
+	return s.consumeIterator(iterator)
+}
+
+func (s *applicationProfileState) All() ([]*api.ApplicationProfile, error) {
+	tx := s.db.Txn(false)
+	defer tx.Abort()
+	iterator, err := tx.Get(s.tableName(), "id")
 	if err != nil {
 		return nil, err
 	}

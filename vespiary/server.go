@@ -22,7 +22,7 @@ type FSM interface {
 	RemoveDeviceUsername(ctx context.Context, accountID string, deviceUsername string) error
 	CreateApplication(ctx context.Context, accountID, name string) (string, error)
 	DeleteApplication(ctx context.Context, id string) error
-	CreateApplicationProfile(ctx context.Context, applicationID, accountID, name string) (string, error)
+	CreateApplicationProfile(ctx context.Context, applicationID, accountID, name, password string) (string, error)
 	DeleteApplicationProfile(ctx context.Context, id string) error
 }
 
@@ -217,8 +217,22 @@ func (s *server) DeleteApplication(ctx context.Context, input *api.DeleteApplica
 	}
 	return &api.DeleteApplicationResponse{}, nil
 }
+func (s *server) ListApplications(ctx context.Context, input *api.ListApplicationsRequest) (*api.ListApplicationsResponse, error) {
+	out, err := s.state.Applications().All()
+	if err != nil {
+		return nil, err
+	}
+	return &api.ListApplicationsResponse{Applications: out}, nil
+}
+func (s *server) ListApplicationsByAccountID(ctx context.Context, input *api.ListApplicationsByAccountIDRequest) (*api.ListApplicationsByAccountIDResponse, error) {
+	out, err := s.state.Applications().ListByAccountID(input.AccountID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.ListApplicationsByAccountIDResponse{Applications: out}, nil
+}
 func (s *server) CreateApplicationProfile(ctx context.Context, input *api.CreateApplicationProfileRequest) (*api.CreateApplicationProfileResponse, error) {
-	id, err := s.fsm.CreateApplication(ctx, input.AccountID, input.Name)
+	id, err := s.fsm.CreateApplicationProfile(ctx, input.ApplicationID, input.AccountID, input.Name, input.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -226,6 +240,21 @@ func (s *server) CreateApplicationProfile(ctx context.Context, input *api.Create
 		ID: id,
 	}, nil
 }
+func (s *server) ListApplicationProfiles(ctx context.Context, input *api.ListApplicationProfilesRequest) (*api.ListApplicationProfilesResponse, error) {
+	out, err := s.state.ApplicationProfiles().All()
+	if err != nil {
+		return nil, err
+	}
+	return &api.ListApplicationProfilesResponse{ApplicationProfiles: out}, nil
+}
+func (s *server) ListApplicationProfilesByAccountID(ctx context.Context, input *api.ListApplicationProfilesByAccountIDRequest) (*api.ListApplicationProfilesByAccountIDResponse, error) {
+	out, err := s.state.ApplicationProfiles().ListByAccountID(input.AccountID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.ListApplicationProfilesByAccountIDResponse{ApplicationProfiles: out}, nil
+}
+
 func (s *server) DeleteApplicationProfile(ctx context.Context, input *api.DeleteApplicationProfileRequest) (*api.DeleteApplicationProfileResponse, error) {
 	err := s.fsm.DeleteApplicationProfile(ctx, input.ID)
 	if err != nil {

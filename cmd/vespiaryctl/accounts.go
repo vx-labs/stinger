@@ -131,18 +131,20 @@ func Accounts(ctx context.Context, config *viper.Viper) *cobra.Command {
 	cmd.AddCommand(removeUsername)
 
 	delete := (&cobra.Command{
-		Use: "delete",
+		Use:  "delete",
+		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			conn, l := mustDial(ctx, cmd, config)
-			_, err := api.NewVespiaryClient(conn).DeleteAccount(ctx, &api.DeleteAccountRequest{
-				ID: config.GetString("id"),
-			})
-			if err != nil {
-				l.Fatal("failed to delete account", zap.Error(err))
+			for _, id := range args {
+				_, err := api.NewVespiaryClient(conn).DeleteAccount(ctx, &api.DeleteAccountRequest{
+					ID: id,
+				})
+				if err != nil {
+					l.Fatal("failed to delete account", zap.Error(err))
+				}
 			}
 		},
 	})
-	delete.Flags().StringP("id", "i", "", "Account ID")
 	cmd.AddCommand(delete)
 
 	return cmd
