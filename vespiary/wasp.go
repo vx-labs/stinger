@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 
+	"github.com/vx-labs/vespiary/vespiary/state"
 	"github.com/vx-labs/wasp/v4/wasp/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -24,10 +25,10 @@ func fingerprintString(buf string) string {
 
 type WaspAuthenticationServer struct {
 	fsm   FSM
-	state State
+	state state.Store
 }
 
-func NewWaspAuthenticationServer(fsm FSM, state State) *WaspAuthenticationServer {
+func NewWaspAuthenticationServer(fsm FSM, state state.Store) *WaspAuthenticationServer {
 	return &WaspAuthenticationServer{
 		fsm:   fsm,
 		state: state,
@@ -39,7 +40,7 @@ func (s *WaspAuthenticationServer) Serve(grpcServer *grpc.Server) {
 }
 
 func (s *WaspAuthenticationServer) AuthenticateMQTTClient(ctx context.Context, input *auth.WaspAuthenticationRequest) (*auth.WaspAuthenticationResponse, error) {
-	account, err := s.state.AccountByDeviceUsername(string(input.MQTT.Username))
+	account, err := s.state.Accounts().ByDeviceUsername(string(input.MQTT.Username))
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid username or password")
 	}
