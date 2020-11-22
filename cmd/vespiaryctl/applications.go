@@ -60,8 +60,9 @@ func Applications(ctx context.Context, config *viper.Viper) *cobra.Command {
 	cmd.AddCommand(list)
 
 	delete := (&cobra.Command{
-		Use:  "delete",
-		Args: cobra.MinimumNArgs(1),
+		Use:     "delete",
+		Aliases: []string{"rm"},
+		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			conn, l := mustDial(ctx, cmd, config)
 			for _, id := range args {

@@ -8,6 +8,8 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -50,24 +52,62 @@ func main() {
 		Use: "raft",
 	}
 	raft.AddCommand(&cobra.Command{
-		Use: "members",
+		Use:     "topology",
+		Aliases: []string{"members", "topo"},
 		Run: func(cmd *cobra.Command, _ []string) {
 			conn, l := mustDial(ctx, cmd, config)
-			out, err := cluster.NewMultiRaftClient(conn).GetMembers(ctx, &cluster.GetMembersRequest{})
+			out, err := cluster.NewMultiRaftClient(conn).GetTopology(ctx, &cluster.GetTopologyRequest{
+				ClusterID: "vespiary",
+			})
 			if err != nil {
-				l.Fatal("failed to list raft members", zap.Error(err))
+				l.Fatal("failed to get raft topology", zap.Error(err))
 			}
-			table := getTable([]string{"ID", "Leader", "Address", "Health"}, cmd.OutOrStdout())
+			sort.SliceStable(out.Members, func(i, j int) bool {
+				return out.Members[i].ID < out.Members[j].ID
+			})
+			table := getTable([]string{"ID", "Suffrage", "Address", "Progress", "Health"}, cmd.OutOrStdout())
 			for _, member := range out.GetMembers() {
 				healthString := "healthy"
 				if !member.IsAlive {
 					healthString = "unhealthy"
 				}
+				suffrage := "learner"
+				if member.IsLeader {
+					suffrage = "leader"
+				} else if member.IsVoter {
+					suffrage = "voter"
+				}
 				table.Append([]string{
-					fmt.Sprintf("%x", member.GetID()), fmt.Sprintf("%v", member.GetIsLeader()), member.GetAddress(), healthString,
+					fmt.Sprintf("%x", member.GetID()),
+					suffrage,
+					member.GetAddress(),
+					fmt.Sprintf("%d/%d", member.GetApplied(), out.Committed),
+					healthString,
 				})
 			}
 			table.Render()
+		},
+	})
+	raft.AddCommand(&cobra.Command{
+		Use:     "remove-member",
+		Aliases: []string{"rm"},
+		Args:    cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			conn, l := mustDial(ctx, cmd, config)
+			for _, arg := range args {
+				v, err := strconv.ParseUint(arg, 16, 64)
+				if err != nil {
+					l.Fatal("failed to parse member id", zap.Error(err))
+				}
+				_, err = cluster.NewMultiRaftClient(conn).RemoveMember(ctx, &cluster.RemoveMultiRaftMemberRequest{
+					ID:        v,
+					ClusterID: "vespiary",
+					Force:     true,
+				})
+				if err != nil {
+					l.Fatal("failed to get raft topology", zap.Error(err))
+				}
+			}
 		},
 	})
 
