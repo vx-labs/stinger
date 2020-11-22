@@ -127,6 +127,13 @@ message CreateApplicationProfileRequest {
 }
 message CreateApplicationProfileResponse { string ID = 1; }
 message DeleteApplicationProfileRequest { string ID = 1; }
+message GetApplicationProfileByAccountIDRequest {
+  string ID = 1;
+  string AccountID = 2;
+};
+message GetApplicationProfileByAccountIDResponse {
+  ApplicationProfile ApplicationProfile = 1;
+};
 message DeleteApplicationProfileResponse {}
 message ListApplicationProfilesRequest {};
 message ListApplicationProfilesResponse {
@@ -175,6 +182,8 @@ service Vespiary {
 
   rpc CreateApplicationProfile(CreateApplicationProfileRequest)
       returns (CreateApplicationProfileResponse);
+  rpc GetApplicationProfileByAccountID(GetApplicationProfileByAccountIDRequest)
+      returns (GetApplicationProfileByAccountIDResponse);
   rpc GetApplication(GetApplicationRequest) returns (GetApplicationResponse);
   rpc GetApplicationByAccountID(GetApplicationByAccountIDRequest)
       returns (GetApplicationByAccountIDResponse);

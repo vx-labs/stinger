@@ -268,6 +268,13 @@ func (s *server) ListApplicationProfiles(ctx context.Context, input *api.ListApp
 	}
 	return &api.ListApplicationProfilesResponse{ApplicationProfiles: out}, nil
 }
+func (s *server) GetApplicationProfileByAccountID(ctx context.Context, input *api.GetApplicationProfileByAccountIDRequest) (*api.GetApplicationProfileByAccountIDResponse, error) {
+	out, err := s.state.ApplicationProfiles().ByAccountID(input.ID, input.AccountID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.GetApplicationProfileByAccountIDResponse{ApplicationProfile: out}, nil
+}
 func (s *server) ListApplicationProfilesByAccountID(ctx context.Context, input *api.ListApplicationProfilesByAccountIDRequest) (*api.ListApplicationProfilesByAccountIDResponse, error) {
 	out, err := s.state.ApplicationProfiles().ListByAccountID(input.AccountID)
 	if err != nil {
