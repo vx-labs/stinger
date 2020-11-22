@@ -12,7 +12,6 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/vx-labs/cluster/raft"
 	"github.com/vx-labs/vespiary/vespiary/api"
 	"github.com/vx-labs/vespiary/vespiary/audit"
 	"github.com/vx-labs/vespiary/vespiary/state"
@@ -50,15 +49,19 @@ func generateRandomBytes(n int) ([]byte, error) {
 	return b, nil
 }
 
-func NewFSM(id uint64, state state.Store, commandsCh chan raft.Command, recorder audit.Recorder) *FSM {
-	return &FSM{id: id, state: state, commandsCh: commandsCh, recorder: recorder}
+type Applier interface {
+	Apply(context.Context, []byte) (uint64, error)
+}
+
+func NewFSM(id uint64, state state.Store, applier Applier, recorder audit.Recorder) *FSM {
+	return &FSM{id: id, state: state, applier: applier, recorder: recorder}
 }
 
 type FSM struct {
-	id         uint64
-	state      state.Store
-	commandsCh chan raft.Command
-	recorder   audit.Recorder
+	id       uint64
+	state    state.Store
+	applier  Applier
+	recorder audit.Recorder
 }
 
 func (f *FSM) record(ctx context.Context, events ...*StateTransition) error {
@@ -132,21 +135,11 @@ func (f *FSM) commit(ctx context.Context, events ...*StateTransition) error {
 	}
 	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
-	out := make(chan error)
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case f.commandsCh <- raft.Command{Ctx: ctx, ErrCh: out, Payload: payload}:
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case err := <-out:
-			if err == nil {
-				f.record(ctx, events...)
-			}
-			return err
-		}
+	_, err = f.applier.Apply(ctx, payload)
+	if err == nil {
+		f.record(ctx, events...)
 	}
+	return err
 }
 
 func (f *FSM) CreateAccount(ctx context.Context, name string, principals, deviceUsernames []string) (string, error) {

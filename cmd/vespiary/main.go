@@ -135,7 +135,6 @@ func main() {
 			healthServer.Resume()
 			operations := async.NewOperations(ctx, vespiary.L(ctx))
 			cancelCh := make(chan struct{})
-			commandsCh := make(chan raft.Command)
 			if config.GetString("rpc-tls-certificate-file") == "" || config.GetString("rpc-tls-private-key-file") == "" {
 				vespiary.L(ctx).Warn("TLS certificate or private key not provided. GRPC transport security will use a self-signed generated certificate.")
 			}
@@ -174,7 +173,8 @@ func main() {
 				vespiary.L(ctx).Fatal("failed to create audit recorder", zap.Error(err))
 			}
 
-			stateMachine := fsm.NewFSM(id, stateStore, commandsCh, auditRecorder)
+			var stateMachine *fsm.FSM
+
 			raftConfig := cluster.RaftConfig{
 				GetStateSnapshot: stateStore.Dump,
 				CommitApplier: func(ctx context.Context, event raft.Commit) error {
@@ -210,6 +210,8 @@ func main() {
 				RaftConfig: raftConfig,
 			}, rpcDialer, server, vespiary.L(ctx))
 			clusterNode := clusterMultiNode.Node("vespiary", raftConfig)
+			stateMachine = fsm.NewFSM(id, stateStore, clusterNode, auditRecorder)
+
 			operations.Run("cluster node", func(ctx context.Context) {
 				clusterNode.Run(ctx)
 			})
@@ -225,22 +227,6 @@ func main() {
 				}
 			})
 
-			operations.Run("command publisher", func(ctx context.Context) {
-				for {
-					select {
-					case <-ctx.Done():
-						return
-					case event := <-commandsCh:
-						err := clusterNode.Apply(event.Ctx, event.Payload)
-						select {
-						case <-ctx.Done():
-						case <-event.Ctx.Done():
-						case event.ErrCh <- err:
-						}
-						close(event.ErrCh)
-					}
-				}
-			})
 			<-clusterNode.Ready()
 			healthServer.SetServingStatus("rpc", healthpb.HealthCheckResponse_SERVING)
 
