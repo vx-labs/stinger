@@ -59,7 +59,7 @@ func (s *WaspAuthenticationServer) AuthenticateMQTTClient(ctx context.Context, i
 
 		if bytes.Equal(candidatePassword[:], profile.PasswordFingerprint) {
 			return &auth.WaspAuthenticationResponse{
-				ID:         fmt.Sprintf("%s/%s/%s", application.Name, profile.Name, uuid.New().String()),
+				ID:         fmt.Sprintf("%s/%s", profile.ID, uuid.New().String()),
 				MountPoint: fmt.Sprintf("%s/%s", account.ID, application.ID),
 			}, nil
 		}
