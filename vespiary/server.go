@@ -217,6 +217,17 @@ func (s *server) DeleteApplication(ctx context.Context, input *api.DeleteApplica
 	}
 	return &api.DeleteApplicationResponse{}, nil
 }
+func (s *server) DeleteApplicationByAccountID(ctx context.Context, input *api.DeleteApplicationByAccountIDRequest) (*api.DeleteApplicationByAccountIDResponse, error) {
+	_, err := s.state.Applications().ByAccountID(input.ID, input.AccountID)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "application not found")
+	}
+	err = s.fsm.DeleteApplication(ctx, input.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &api.DeleteApplicationByAccountIDResponse{}, nil
+}
 func (s *server) ListApplications(ctx context.Context, input *api.ListApplicationsRequest) (*api.ListApplicationsResponse, error) {
 	out, err := s.state.Applications().All()
 	if err != nil {
@@ -234,14 +245,14 @@ func (s *server) GetApplication(ctx context.Context, input *api.GetApplicationRe
 func (s *server) GetApplicationByAccountID(ctx context.Context, input *api.GetApplicationByAccountIDRequest) (*api.GetApplicationByAccountIDResponse, error) {
 	out, err := s.state.Applications().ByAccountID(input.Id, input.AccountID)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.NotFound, "application not found")
 	}
 	return &api.GetApplicationByAccountIDResponse{Application: out}, nil
 }
 func (s *server) GetApplicationByName(ctx context.Context, input *api.GetApplicationByNameRequest) (*api.GetApplicationByNameResponse, error) {
 	out, err := s.state.Applications().ByNameAndAccountID(input.Name, input.AccountID)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.NotFound, "application not found")
 	}
 	return &api.GetApplicationByNameResponse{Application: out}, nil
 }

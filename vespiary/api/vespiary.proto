@@ -119,6 +119,12 @@ message CreateApplicationResponse { string ID = 1; }
 message DeleteApplicationRequest { string ID = 1; }
 message DeleteApplicationResponse {}
 
+message DeleteApplicationByAccountIDRequest {
+  string ID = 1;
+  string AccountID = 2;
+}
+message DeleteApplicationByAccountIDResponse {}
+
 message CreateApplicationProfileRequest {
   string AccountID = 1;
   string ApplicationID = 2;
@@ -175,6 +181,8 @@ service Vespiary {
       returns (CreateApplicationResponse);
   rpc DeleteApplication(DeleteApplicationRequest)
       returns (DeleteApplicationResponse);
+  rpc DeleteApplicationByAccountID(DeleteApplicationByAccountIDRequest)
+      returns (DeleteApplicationByAccountIDResponse);
   rpc ListApplications(ListApplicationsRequest)
       returns (ListApplicationsResponse);
   rpc ListApplicationsByAccountID(ListApplicationsByAccountIDRequest)
