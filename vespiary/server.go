@@ -308,3 +308,11 @@ func (s *server) DeleteApplicationProfile(ctx context.Context, input *api.Delete
 	}
 	return &api.DeleteApplicationProfileResponse{}, nil
 }
+
+func (s *server) DeleteApplicationProfileByAccountID(ctx context.Context, input *api.DeleteApplicationProfileByAccountIDRequest) (*api.DeleteApplicationProfileByAccountIDResponse, error) {
+	_, err := s.state.ApplicationProfiles().ByAccountID(input.ID, input.AccountID)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "application profile not found")
+	}
+	return &api.DeleteApplicationProfileByAccountIDResponse{}, s.fsm.DeleteApplicationProfile(ctx, input.ID)
+}
