@@ -2,6 +2,7 @@ package audit
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/vx-labs/vespiary/vespiary/api"
@@ -24,7 +25,7 @@ func (s *grpcRecorder) RecordEvent(tenant string, eventKind event, payload map[s
 	}
 	_, err := s.client.PutVespiaryEvents(s.ctx, &api.PutVespiaryEventRequest{
 		Events: []*api.VespiaryAuditEvent{
-			{Timestamp: time.Now().UnixNano(), Tenant: tenant, Kind: string(eventKind), Attributes: attributes},
+			{Timestamp: time.Now().UnixNano(), Tenant: fmt.Sprintf("_root/%s", tenant), Kind: string(eventKind), Attributes: attributes},
 		},
 	})
 	return err

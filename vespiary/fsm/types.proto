@@ -51,7 +51,10 @@ message ApplicationCreated {
   string Name = 3;
   int64 CreatedAt = 4;
 }
-message ApplicationDeleted { string ID = 1; }
+message ApplicationDeleted {
+  string ID = 1;
+  string AccountID = 2;
+}
 message ApplicationProfileCreated {
   string ID = 1;
   string ApplicationID = 2;
@@ -62,7 +65,10 @@ message ApplicationProfileCreated {
   bytes PasswordFingerprint = 7;
   bytes PasswordSalt = 8;
 }
-message ApplicationProfileDeleted { string ID = 1; }
+message ApplicationProfileDeleted {
+  string ID = 1;
+  string AccountID = 2;
+}
 
 message StateTransition {
   oneof Event {

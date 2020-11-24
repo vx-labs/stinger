@@ -82,6 +82,32 @@ func (f *FSM) record(ctx context.Context, events ...*StateTransition) error {
 			err = f.recorder.RecordEvent(tenant, audit.DeviceCreated, map[string]string{
 				"device_id": input.ID,
 			})
+		case *StateTransition_ApplicationCreated:
+			input := event.ApplicationCreated
+			tenant := input.AccountID
+			err = f.recorder.RecordEvent(tenant, audit.ApplicationCreated, map[string]string{
+				"application_id":   input.ID,
+				"application_name": input.Name,
+			})
+		case *StateTransition_ApplicationDeleted:
+			input := event.ApplicationDeleted
+			tenant := input.AccountID
+			err = f.recorder.RecordEvent(tenant, audit.ApplicationDeleted, map[string]string{
+				"application_id": input.ID,
+			})
+		case *StateTransition_ApplicationProfileCreated:
+			input := event.ApplicationProfileCreated
+			tenant := input.AccountID
+			err = f.recorder.RecordEvent(tenant, audit.ApplicationProfileCreated, map[string]string{
+				"application_profile_id":   input.ID,
+				"application_profile_name": input.Name,
+			})
+		case *StateTransition_ApplicationProfileDeleted:
+			input := event.ApplicationProfileDeleted
+			tenant := input.AccountID
+			err = f.recorder.RecordEvent(tenant, audit.ApplicationProfileDeleted, map[string]string{
+				"application_profile_id": input.ID,
+			})
 		case *StateTransition_DeviceDeleted:
 			input := event.DeviceDeleted
 			tenant := input.Owner
@@ -265,13 +291,14 @@ func (f *FSM) CreateApplication(ctx context.Context, accountID, name string) (st
 	}})
 }
 func (f *FSM) DeleteApplication(ctx context.Context, id string) error {
-	_, err := f.state.Applications().ByID(id)
+	application, err := f.state.Applications().ByID(id)
 	if err != nil {
 		return err
 	}
 	return f.commit(ctx, &StateTransition{Event: &StateTransition_ApplicationDeleted{
 		ApplicationDeleted: &ApplicationDeleted{
-			ID: id,
+			ID:        id,
+			AccountID: application.AccountID,
 		},
 	}})
 }
@@ -310,14 +337,15 @@ func (f *FSM) CreateApplicationProfile(ctx context.Context, applicationID, accou
 	}})
 }
 func (f *FSM) DeleteApplicationProfile(ctx context.Context, id string) error {
-	_, err := f.state.ApplicationProfiles().ByID(id)
+	applicationProfile, err := f.state.ApplicationProfiles().ByID(id)
 	if err != nil {
 		return err
 	}
 
 	return f.commit(ctx, &StateTransition{Event: &StateTransition_ApplicationProfileDeleted{
 		ApplicationProfileDeleted: &ApplicationProfileDeleted{
-			ID: id,
+			ID:        id,
+			AccountID: applicationProfile.AccountID,
 		},
 	}})
 }
