@@ -20,7 +20,7 @@ require (
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.6.1
 	github.com/vx-labs/cluster v1.6.3
-	github.com/vx-labs/wasp/v4 v4.0.1
+	github.com/vx-labs/wasp/v4 v4.1.0
 	go.etcd.io/etcd v0.0.0-20200716221620-18dfb9cca345
 	go.uber.org/zap v1.16.0
 	google.golang.org/grpc v1.33.2

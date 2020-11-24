@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"crypto/x509"
 	"fmt"
 	"strings"
 
@@ -27,14 +28,18 @@ func fingerprintString(buf string) string {
 }
 
 type WaspAuthenticationServer struct {
-	fsm   FSM
-	state state.Store
+	fsm            FSM
+	state          state.Store
+	trustedAdminCA x509.VerifyOptions
 }
 
-func NewWaspAuthenticationServer(fsm FSM, state state.Store) *WaspAuthenticationServer {
+func NewWaspAuthenticationServer(fsm FSM, state state.Store, trustedAdminCAPool *x509.CertPool) *WaspAuthenticationServer {
 	return &WaspAuthenticationServer{
 		fsm:   fsm,
 		state: state,
+		trustedAdminCA: x509.VerifyOptions{
+			Roots: trustedAdminCAPool,
+		},
 	}
 }
 
@@ -43,6 +48,18 @@ func (s *WaspAuthenticationServer) Serve(grpcServer *grpc.Server) {
 }
 
 func (s *WaspAuthenticationServer) AuthenticateMQTTClient(ctx context.Context, input *auth.WaspAuthenticationRequest) (*auth.WaspAuthenticationResponse, error) {
+	if len(input.Transport.X509CertificateChain) > 0 {
+		cert, err := x509.ParseCertificate(input.Transport.X509CertificateChain[0])
+		if err == nil {
+			_, err := cert.Verify(s.trustedAdminCA)
+			if err == nil {
+				return &auth.WaspAuthenticationResponse{
+					ID:         fmt.Sprintf("_admin/%s", uuid.New().String()),
+					MountPoint: "",
+				}, nil
+			}
+		}
+	}
 	tokens := strings.SplitN(string(input.MQTT.Username), "/", 3)
 	if len(tokens) == 3 {
 		account, err := s.state.Accounts().ByName(string(tokens[0]))

@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"crypto/x509"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/pprof"
@@ -218,7 +221,19 @@ func main() {
 
 			vespiaryServer := vespiary.NewServer(stateMachine, stateStore)
 			vespiaryServer.Serve(server)
-			waspAuthServer := vespiary.NewWaspAuthenticationServer(stateMachine, stateStore)
+
+			adminCertPool := x509.NewCertPool()
+			ca, err := ioutil.ReadFile(config.GetString("rpc-tls-certificate-authority-file"))
+			if err != nil {
+				panic(fmt.Errorf("could not read admin ca certificate: %s", err))
+			}
+
+			// Append the client certificates from the CA
+			if ok := adminCertPool.AppendCertsFromPEM(ca); !ok {
+				panic(errors.New("failed to append client certs to admin certificate pool"))
+			}
+
+			waspAuthServer := vespiary.NewWaspAuthenticationServer(stateMachine, stateStore, adminCertPool)
 			waspAuthServer.Serve(server)
 			operations.Run("cluster listener", func(ctx context.Context) {
 				err := server.Serve(clusterListener)

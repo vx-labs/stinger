@@ -486,6 +486,8 @@ github.com/vx-labs/wasp/v4 v1.8.31 h1:c5soQ0KgOEdu7QoI4pRM/Hv7clS2SQZ5dhe+wcKMYS
 github.com/vx-labs/wasp/v4 v1.8.31/go.mod h1:muVF5XlJI/yAw2jKd9UcnCVLTkLtRh9g+eESQCZT3ro=
 github.com/vx-labs/wasp/v4 v4.0.1 h1:7x3Yh7OO/zQL7altYsncJgy4OwhDL0GsZ5z6BWmb5ls=
 github.com/vx-labs/wasp/v4 v4.0.1/go.mod h1:y29jR5faYPKGbf/6LQ+61vcl63ylYyQuGrF7w3XKB28=
+github.com/vx-labs/wasp/v4 v4.1.0 h1:+5U1ttCaECWvrWpCvi3s7P1i+qAP5jobYVBPVbrBr2w=
+github.com/vx-labs/wasp/v4 v4.1.0/go.mod h1:y29jR5faYPKGbf/6LQ+61vcl63ylYyQuGrF7w3XKB28=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 github.com/zond/gotomic v0.0.0-20160912093511-c442ca1e4aa6/go.mod h1:lfLoUEAewHQJgm/Xyo4SlOsbp9a8sFUhBGdyn0lWcYQ=
