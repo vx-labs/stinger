@@ -55,7 +55,7 @@ func (s *WaspAuthenticationServer) AuthenticateMQTTClient(ctx context.Context, i
 			if err == nil {
 				return &auth.WaspAuthenticationResponse{
 					ID:         fmt.Sprintf("_admin/%s", uuid.New().String()),
-					MountPoint: "",
+					MountPoint: "_root",
 				}, nil
 			}
 		}
@@ -77,7 +77,7 @@ func (s *WaspAuthenticationServer) AuthenticateMQTTClient(ctx context.Context, i
 		if bytes.Equal(candidatePassword[:], profile.PasswordFingerprint) {
 			return &auth.WaspAuthenticationResponse{
 				ID:         fmt.Sprintf("%s/%s", profile.ID, uuid.New().String()),
-				MountPoint: fmt.Sprintf("%s/%s", account.ID, application.ID),
+				MountPoint: fmt.Sprintf("_root/%s/%s", account.ID, application.ID),
 			}, nil
 		}
 		return nil, status.Error(codes.InvalidArgument, "invalid username or password")

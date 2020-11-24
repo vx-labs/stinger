@@ -221,16 +221,17 @@ func main() {
 
 			vespiaryServer := vespiary.NewServer(stateMachine, stateStore)
 			vespiaryServer.Serve(server)
-
 			adminCertPool := x509.NewCertPool()
-			ca, err := ioutil.ReadFile(config.GetString("rpc-tls-certificate-authority-file"))
-			if err != nil {
-				panic(fmt.Errorf("could not read admin ca certificate: %s", err))
-			}
+			if adminCA := config.GetString("rpc-tls-certificate-authority-file"); adminCA != "" {
+				ca, err := ioutil.ReadFile(adminCA)
+				if err != nil {
+					panic(fmt.Errorf("could not read admin ca certificate: %s", err))
+				}
 
-			// Append the client certificates from the CA
-			if ok := adminCertPool.AppendCertsFromPEM(ca); !ok {
-				panic(errors.New("failed to append client certs to admin certificate pool"))
+				// Append the client certificates from the CA
+				if ok := adminCertPool.AppendCertsFromPEM(ca); !ok {
+					panic(errors.New("failed to append client certs to admin certificate pool"))
+				}
 			}
 
 			waspAuthServer := vespiary.NewWaspAuthenticationServer(stateMachine, stateStore, adminCertPool)
