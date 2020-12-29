@@ -71,7 +71,9 @@ func (s *WaspAuthenticationServer) AuthenticateMQTTClient(ctx context.Context, i
 			return nil, status.Error(codes.InvalidArgument, "invalid username or password")
 		}
 		profile, err := s.state.ApplicationProfiles().ByNameAndApplicationID(tokens[2], application.ID)
-
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, "invalid username or password")
+		}
 		candidatePassword := sha256.Sum256(append(input.MQTT.Password, profile.PasswordSalt...))
 
 		if bytes.Equal(candidatePassword[:], profile.PasswordFingerprint) {
