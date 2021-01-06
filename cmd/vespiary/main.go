@@ -30,10 +30,17 @@ import (
 	"github.com/vx-labs/wasp/v4/rpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 func localPrivateHost() string {
+	// Maybe we are running on fly.io
+	flyLocalAddr, err := net.ResolveIPAddr("ip", "fly-local-6pn")
+	if err == nil {
+		return flyLocalAddr.IP.String()
+	}
+	// last attempt: use the default outgoing iface.
 	conn, err := net.Dial("udp", "example.net:80")
 	if err != nil {
 		panic(err)
@@ -113,9 +120,34 @@ func main() {
 				vespiary.L(ctx).Info("started pprof", zap.String("pprof_url", fmt.Sprintf("http://%s/", address)))
 			}
 			healthServer := health.NewServer()
-			healthServer.SetServingStatus("mqtt", healthpb.HealthCheckResponse_SERVING)
-			healthServer.SetServingStatus("node", healthpb.HealthCheckResponse_SERVING)
 			healthServer.SetServingStatus("rpc", healthpb.HealthCheckResponse_NOT_SERVING)
+
+			if healthPort := config.GetInt("health-port"); healthPort != 0 {
+				addr := net.JoinHostPort("::", fmt.Sprintf("%d", healthPort))
+				go func() {
+					mux := http.NewServeMux()
+					mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+						out, err := healthServer.Check(r.Context(), &healthpb.HealthCheckRequest{
+							Service: "rpc",
+						})
+						if err != nil {
+							w.WriteHeader(http.StatusInternalServerError)
+							return
+						}
+						switch out.Status {
+						case grpc_health_v1.HealthCheckResponse_SERVING:
+							w.WriteHeader(http.StatusOK)
+						case grpc_health_v1.HealthCheckResponse_NOT_SERVING:
+							w.WriteHeader(http.StatusTooManyRequests)
+						default:
+							w.WriteHeader(http.StatusInternalServerError)
+						}
+						return
+					})
+					panic(http.ListenAndServe(addr, mux))
+				}()
+				vespiary.L(ctx).Info("started health server", zap.String("pprof_url", fmt.Sprintf("http://%s/", addr)))
+			}
 
 			stateStore := state.NewStateStore()
 			healthServer.Resume()
@@ -137,7 +169,7 @@ func main() {
 				TLSPrivateKeyPath:           config.GetString("rpc-tls-private-key-file"),
 				TLSCertificateAuthorityPath: config.GetString("rpc-tls-certificate-authority-file"),
 			})
-			clusterListener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", config.GetInt("raft-port")))
+			clusterListener, err := net.Listen("tcp", fmt.Sprintf("[::]:%d", config.GetInt("raft-port")))
 			if err != nil {
 				vespiary.L(ctx).Fatal("cluster listener failed to start", zap.Error(err))
 			}
@@ -274,12 +306,13 @@ func main() {
 	cmd.Flags().String("consul-service-tag", "gossip", "Consul auto-join service tag.")
 
 	cmd.Flags().Int("metrics-port", 0, "Start Prometheus HTTP metrics server on this port.")
+	cmd.Flags().Int("health-port", 0, "Start HTTP healthcheck server on this port.")
 	cmd.Flags().Int("serf-port", 3799, "Membership (Serf) port.")
 	cmd.Flags().Int("raft-port", 3899, "Clustering (Raft) port.")
 	cmd.Flags().String("serf-advertized-address", defaultIP, "Advertize this adress to other gossip members.")
 	cmd.Flags().String("raft-advertized-address", defaultIP, "Advertize this adress to other raft nodes.")
-	cmd.Flags().Int("serf-advertized-port", 2799, "Advertize this port to other gossip members.")
-	cmd.Flags().Int("raft-advertized-port", 2899, "Advertize this port to other raft nodes.")
+	cmd.Flags().Int("serf-advertized-port", 3799, "Advertize this port to other gossip members.")
+	cmd.Flags().Int("raft-advertized-port", 3899, "Advertize this port to other raft nodes.")
 	cmd.Flags().StringSliceP("join-node", "j", nil, "Join theses nodes to form a cluster.")
 	cmd.Flags().StringP("data-dir", "d", "/tmp/vespiary", "vespiary persistent data location.")
 
