@@ -463,6 +463,7 @@ github.com/vx-labs/cluster v1.6.2 h1:GOkbhd4COe8hRtmBzmnpve//4D7HsuNn+Kkuj9hfIHc
 github.com/vx-labs/cluster v1.6.2/go.mod h1:hLbLE2+vCXixbFKkARaR2J/umZhAJN/RDR4LVru0lQ0=
 github.com/vx-labs/cluster v1.6.3 h1:cSA4u1N5sMYnU79tRzl0LOaXIIUS0PS4aVg2XfVCnzo=
 github.com/vx-labs/cluster v1.6.3/go.mod h1:hLbLE2+vCXixbFKkARaR2J/umZhAJN/RDR4LVru0lQ0=
+github.com/vx-labs/cluster v1.7.7/go.mod h1:hLbLE2+vCXixbFKkARaR2J/umZhAJN/RDR4LVru0lQ0=
 github.com/vx-labs/commitlog v1.2.4/go.mod h1:oD9S7H5eUBFcEg7ZyAxJomwac+B0vulxvEbqQGDhHF0=
 github.com/vx-labs/mqtt-protocol v4.3.5+incompatible h1:Oy6G1b8dVjtnWdiYtAhe7oFyv56c9WYnf8ErXddN7fQ=
 github.com/vx-labs/mqtt-protocol v4.3.5+incompatible/go.mod h1:pTTydlvsQlJkWKiGB8xwGJ5QgBOxU6yUiGm4u6C0Ydg=
