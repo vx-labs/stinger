@@ -65,7 +65,7 @@ func main() {
 			sort.SliceStable(out.Members, func(i, j int) bool {
 				return out.Members[i].ID < out.Members[j].ID
 			})
-			table := getTable([]string{"ID", "Suffrage", "Address", "Progress", "Health"}, cmd.OutOrStdout())
+			table := getTable([]string{"ID", "Suffrage", "Address", "Progress", "Health", "Latency"}, cmd.OutOrStdout())
 			for _, member := range out.GetMembers() {
 				healthString := "healthy"
 				if !member.IsAlive {
@@ -83,6 +83,7 @@ func main() {
 					member.GetAddress(),
 					fmt.Sprintf("%d/%d", member.GetApplied(), out.Committed),
 					healthString,
+					fmt.Sprintf("%dms", member.LatencyMs),
 				})
 			}
 			table.Render()
