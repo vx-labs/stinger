@@ -10,7 +10,7 @@ ARG BUILT_VERSION="snapshot"
 RUN go build -buildmode=exe -ldflags="-s -w -X github.com/vx-labs/vespiary/cmd/vespiary/version.BuiltVersion=${BUILT_VERSION}" \
        -a -o /bin/vespiary ./cmd/vespiary
 
-FROM alpine as prod
+FROM alpine:3.15 as prod
 ENTRYPOINT ["/usr/bin/vespiary"]
 RUN apk -U add ca-certificates && \
     rm -rf /var/cache/apk/*
